@@ -1,0 +1,75 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 bucket and DynamoDB table for Terraform
+Parameters:
+  ProjectName:
+    Description: Set the project name.
+    Type: String
+    Default: terraform-state
+Resources:
+  TerraformStateS3Bucket:
+    Type: AWS::S3::Bucket
+    # DeletionPolicy: Retain
+    # UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub ${ProjectName}-${AWS::Region}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: Move-to-Intelligent-Tiering-after-0day
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 0
+                StorageClass: INTELLIGENT_TIERING
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 7
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-${AWS::Region}-${AWS::AccountId}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+  TerraformLockDynamodbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${ProjectName}-lock
+      TableClass: STANDARD
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      ContributorInsightsSpecification:
+        Enabled: false
+      DeletionProtectionEnabled: false
+      SSESpecification:
+        SSEEnabled: false
+      TimeToLiveSpecification:
+        Enabled: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-lock
+        - Key: ProjectName
+          Value: !Ref ProjectName
+Outputs:
+  TerraformStateS3Bucket:
+    Value: !Ref TerraformStateS3Bucket
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-TerraformStateS3Bucket
+  TerraformLockDynamodbTable:
+    Value: !Ref TerraformLockDynamodbTable
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-TerraformLockDynamodbTable
