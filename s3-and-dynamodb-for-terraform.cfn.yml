@@ -5,7 +5,7 @@ Parameters:
   ProjectName:
     Description: Set the project name.
     Type: String
-    Default: terraform-state
+    Default: tfstate
 Resources:
   TerraformStateS3Bucket:
     Type: AWS::S3::Bucket
