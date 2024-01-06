@@ -1,39 +1,3 @@
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "slc"
-}
-
-variable "env_type" {
-  description = "Environment type"
-  type        = string
-  default     = "dev"
-}
-
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for the private subnets"
-  type        = list(string)
-  default     = ["10.0.0.0/24", "10.0.16.0/24", "10.0.32.0/24"]
-}
-
-data "aws_availability_zones" "az" {
-  state = "available"
-}
-
-locals {
-  availability_zones = slice(
-    data.aws_availability_zones.az.names,
-    0,
-    length(var.private_subnet_cidrs)
-  )
-}
-
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -122,29 +86,4 @@ resource "aws_subnet" "private_subnet" {
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
-}
-
-output "vpc_id" {
-  description = "VPC ID"
-  value       = aws_vpc.vpc.id
-}
-
-output "private_subnet_ids" {
-  description = "Private subnet IDs"
-  value       = aws_subnet.private_subnet[*].id
-}
-
-output "vpc_flow_log" {
-  description = "VPC flow log"
-  value       = aws_flow_log.flow_log.id
-}
-
-output "vpc_flow_log_group" {
-  description = "VPC flow log group"
-  value       = aws_cloudwatch_log_group.vpc_logs_group.name
-}
-
-output "vpc_flow_log_iam_role" {
-  description = "VPC flow log IAM role"
-  value       = aws_iam_role.vpc_logs_iam_role.name
 }
