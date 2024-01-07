@@ -4,4 +4,5 @@ module "vpc" {
   env_type             = var.env_type
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
+  public_subnet_cidrs  = var.public_subnet_cidrs
 }

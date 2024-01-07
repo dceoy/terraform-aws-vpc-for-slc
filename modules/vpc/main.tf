@@ -73,17 +73,104 @@ resource "aws_iam_role" "vpc_logs_iam_role" {
   }
 }
 
-resource "aws_subnet" "private_subnet" {
-  count                   = length(local.availability_zones)
+resource "aws_subnet" "private_subnets" {
+  count                   = length(local.private_subnet_azs)
   cidr_block              = var.private_subnet_cidrs[count.index]
-  availability_zone       = local.availability_zones[count.index]
+  availability_zone       = local.private_subnet_azs[count.index]
   vpc_id                  = aws_vpc.vpc.id
   map_public_ip_on_launch = false
   tags = {
     Application = "${var.project_name}-${var.env_type}-subnet-private${count.index}"
     Network     = "Private"
-    Name        = "${var.project_name}-${var.env_type}-subnet-private${count.index}-${local.availability_zones[count.index]}"
+    Name        = "${var.project_name}-${var.env_type}-subnet-private${count.index}-${local.private_subnet_azs[count.index]}"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
+}
+
+resource "aws_route_table" "private_route_tables" {
+  count  = length(local.private_subnet_azs)
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name        = "${var.project_name}-${var.env_type}-rtb-private${count.index}"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_route_table_association" "private_route_table_associations" {
+  count          = length(local.private_subnet_azs)
+  subnet_id      = aws_subnet.private_subnets[count.index].id
+  route_table_id = aws_route_table.private_route_tables[count.index].id
+}
+
+resource "aws_vpc_endpoint" "s3_gateway_endpoint" {
+  vpc_id            = aws_vpc.vpc.id
+  service_name      = "com.amazonaws.${local.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = aws_route_table.private_route_tables[*].id
+  tags = {
+    Name        = "${var.project_name}-${var.env_type}-vpce-gw-s3"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_vpc_endpoint" "dynamodb_gateway_endpoint" {
+  vpc_id            = aws_vpc.vpc.id
+  service_name      = "com.amazonaws.${local.region}.dynamodb"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = aws_route_table.private_route_tables[*].id
+  tags = {
+    Name        = "${var.project_name}-${var.env_type}-vpce-gw-dynamodb"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_subnet" "public_subnets" {
+  count                   = length(local.public_subnet_azs)
+  cidr_block              = var.public_subnet_cidrs[count.index]
+  availability_zone       = local.public_subnet_azs[count.index]
+  vpc_id                  = aws_vpc.vpc.id
+  map_public_ip_on_launch = true
+  tags = {
+    Application = "${var.project_name}-${var.env_type}-subnet-public${count.index}"
+    Network     = "Public"
+    Name        = "${var.project_name}-${var.env_type}-subnet-public${count.index}-${local.public_subnet_azs[count.index]}"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name        = "${var.project_name}-${var.env_type}-rtb-public"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_route_table_association" "public_route_table_associations" {
+  count          = length(local.public_subnet_azs)
+  subnet_id      = aws_subnet.public_subnets[count.index].id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_internet_gateway" "internet_gateway" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Application = "${var.project_name}-${var.env_type}-vpc"
+    Network     = "Public"
+    Name        = "${var.project_name}-${var.env_type}-igw"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_route" "public_route" {
+  route_table_id         = aws_route_table.public_route_table.id
+  gateway_id             = aws_internet_gateway.internet_gateway.id
+  destination_cidr_block = "0.0.0.0/0"
 }
