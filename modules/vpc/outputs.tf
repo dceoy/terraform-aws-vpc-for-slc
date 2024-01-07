@@ -13,6 +13,11 @@ output "vpc_default_network_acl_id" {
   value       = aws_vpc.main.default_network_acl_id
 }
 
+output "vpc_cidr_block" {
+  description = "VPC CIDR block"
+  value       = aws_vpc.main.cidr_block
+}
+
 output "vpc_flow_log_id" {
   description = "VPC flow log"
   value       = aws_flow_log.flow_log.id

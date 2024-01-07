@@ -3,6 +3,11 @@ output "private_subnet_azs" {
   value       = aws_subnet.private[*].availability_zone
 }
 
+output "private_subnet_cidr_blocks" {
+  description = "Private subnet CIDR blocks"
+  value       = aws_subnet.private[*].cidr_block
+}
+
 output "private_subnet_ids" {
   description = "Private subnet IDs"
   value       = aws_subnet.private[*].id
@@ -26,6 +31,11 @@ output "dynamodb_gateway_endpoint" {
 output "public_subnet_azs" {
   description = "Public subnet AZs"
   value       = aws_subnet.public[*].availability_zone
+}
+
+output "public_subnet_cidr_blocks" {
+  description = "Public subnet CIDR blocks"
+  value       = aws_subnet.public[*].cidr_block
 }
 
 output "public_subnet_ids" {

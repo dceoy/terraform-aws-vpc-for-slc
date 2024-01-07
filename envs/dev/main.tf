@@ -14,3 +14,11 @@ module "subnet" {
   public_subnet_count  = var.public_subnet_count
   subnet_newbits       = var.subnet_newbits
 }
+
+module "nat" {
+  source                  = "../../modules/nat"
+  public_subnet_ids       = module.subnet.public_subnet_ids
+  private_route_table_ids = module.subnet.private_route_table_ids
+  project_name            = var.project_name
+  env_type                = var.env_type
+}
