@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "bucket": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string",
+      "default": "envs/dev/terraform.tfstate"
+    },
+    "region": {
+      "type": "string",
+      "default": "us-west-1"
+    },
+    "dynamodb_table": {
+      "type": "string",
+      "default": "tfstate-lock"
+    }
+  },
+  "required": ["bucket", "key", "region", "dynamodb_table"]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "default": "slc"
+    },
+    "env_type": {
+      "type": "string",
+      "default": "dev"
+    },
+    "region": {
+      "type": "string",
+      "default": "us-west-1"
+    },
+    "vpc_cidr_block": {
+      "type": "string",
+      "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$",
+      "default": "10.0.0.0/16"
+    },
+    "private_subnet_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "default": 3
+    },
+    "public_subnet_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "default": 3
+    },
+    "subnet_newbits": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 8
+    }
+  }
+}
+
