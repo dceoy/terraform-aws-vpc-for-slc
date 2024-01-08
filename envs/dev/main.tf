@@ -23,3 +23,12 @@ module "nat" {
   project_name            = var.project_name
   env_type                = var.env_type
 }
+
+module "vpce" {
+  source             = "../../modules/vpce"
+  private_route_table_ids = module.subnet.private_route_table_ids
+  private_subnet_ids = module.subnet.private_subnet_ids
+  security_group_ids = [module.vpc.vpc_default_security_group_id]
+  project_name       = var.project_name
+  env_type           = var.env_type
+}
