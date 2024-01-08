@@ -9,6 +9,20 @@ resource "aws_instance" "server" {
   metadata_options {
     http_tokens = "required"
   }
+  user_data = <<-EOF
+              #!/usr/bin/env bash
+              {
+                echo '{'
+                echo '  "logs": {'
+                echo '    "cloudWatchLogGroup": "${aws_cloudwatch_log_group.server.name}",'
+                echo '    "cloudWatchEncryptionEnabled": true,'
+                echo '    "cloudWatchStreamingEnabled": true'
+                echo '  }'
+                echo '}'
+              } | sudo tee /etc/amazon/ssm/amazon-ssm-agent.json
+              sudo systemctl restart amazon-ssm-agent
+              sudo sh -c 'dnf -y upgrade && dnf clean all && rm -rf /var/cache/dnf'
+              EOF
   tags = {
     Name        = "${var.project_name}-${var.env_type}-ec2-instance"
     ProjectName = var.project_name
@@ -40,7 +54,6 @@ resource "aws_launch_template" "server" {
   metadata_options {
     http_tokens = "required"
   }
-  user_data = base64encode("dnf -y upgrade && dnf clean all && rm -rf /var/cache/dnf")
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -83,16 +96,27 @@ resource "aws_iam_role" "server" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  path                = "/"
+  inline_policy {
+    name = "${var.project_name}-${var.env_type}-ec2-instance-role-policy"
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Action = [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          Effect   = "Allow",
+          Resource = [aws_cloudwatch_log_group.server.arn]
+        }
+      ]
+    })
+  }
+  path = "/"
   tags = {
     Name    = "${var.project_name}-${var.env_type}-ec2-instance-role"
     EnvType = var.env_type
   }
-}
-
-resource "tls_private_key" "server" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "server" {
@@ -105,8 +129,23 @@ resource "aws_key_pair" "server" {
   }
 }
 
+resource "tls_private_key" "server" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 resource "local_file" "server" {
   filename        = "${var.project_name}-${var.env_type}-ec2-key-pair.pem"
   content         = tls_private_key.server.private_key_pem
   file_permission = "0600"
+}
+
+resource "aws_cloudwatch_log_group" "server" {
+  name              = "/aws/ssm/ec2/${var.project_name}-${var.env_type}-ec2-instance"
+  retention_in_days = 14
+  tags = {
+    Name        = "${var.project_name}-${var.env_type}-ssm-ec2-log-group"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
 }

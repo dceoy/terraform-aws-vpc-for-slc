@@ -182,3 +182,18 @@ output "ec2_instance_profile_arn" {
   description = "EC2 instance profile ARN"
   value       = length(module.ec2) > 0 ? module.ec2[0].ec2_instance_profile_arn : null
 }
+
+output "ec2_key_pair_name" {
+  description = "EC2 key pair ID"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_key_pair_name : null
+}
+
+output "ec2_private_key_filename" {
+  description = "EC2 private key file name"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_private_key_filename : null
+}
+
+output "ec2_cloudwatch_log_group_name" {
+  description = "EC2 CloudWatch log group name"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_cloudwatch_log_group_name : null
+}

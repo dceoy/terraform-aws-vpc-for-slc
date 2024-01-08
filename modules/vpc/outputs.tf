@@ -24,7 +24,7 @@ output "vpc_flow_log_id" {
 }
 
 output "vpc_flow_log_cloudwatch_log_group_name" {
-  description = "VPC flow log group"
+  description = "VPC flow log CloudWatch log group name"
   value       = aws_cloudwatch_log_group.flow_log.name
 }
 

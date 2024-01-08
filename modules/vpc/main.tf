@@ -48,7 +48,7 @@ resource "aws_iam_role" "flow_log" {
     ]
   })
   inline_policy {
-    name = "vpc-logs-policy"
+    name = "${var.project_name}-${var.env_type}-vpc-flow-log-role-policy"
     policy = jsonencode({
       Version = "2012-10-17",
       Statement = [
@@ -61,11 +61,12 @@ resource "aws_iam_role" "flow_log" {
             "logs:DescribeLogStreams"
           ],
           Effect   = "Allow",
-          Resource = aws_cloudwatch_log_group.flow_log.arn
+          Resource = [aws_cloudwatch_log_group.flow_log.arn]
         }
       ]
     })
   }
+  path = "/"
   tags = {
     Name        = "${var.project_name}-${var.env_type}-vpc-flow-log-role"
     ProjectName = var.project_name

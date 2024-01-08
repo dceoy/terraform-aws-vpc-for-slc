@@ -27,3 +27,18 @@ output "ec2_instance_profile_arn" {
   description = "EC2 instance profile ARN"
   value       = aws_iam_instance_profile.server.arn
 }
+
+output "ec2_key_pair_name" {
+  description = "EC2 key pair name"
+  value       = aws_key_pair.server.key_name
+}
+
+output "ec2_private_key_filename" {
+  description = "EC2 private key file name"
+  value       = local_file.server.filename
+}
+
+output "ec2_cloudwatch_log_group_name" {
+  description = "EC2 CloudWatch log group name"
+  value       = aws_cloudwatch_log_group.server.name
+}
