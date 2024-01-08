@@ -49,3 +49,9 @@ variable "subnet_newbits" {
     error_message = "Subnet newbits must be greater than 0"
   }
 }
+
+variable "create_nat_gateways" {
+  description = "Create NAT gateways"
+  type        = bool
+  default     = true
+}

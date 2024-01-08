@@ -17,6 +17,7 @@ module "subnet" {
 
 module "nat" {
   source                  = "../../modules/nat"
+  count                   = var.create_nat_gateways && var.public_subnet_count > 0 && var.private_subnet_count > 0 ? 1 : 0
   public_subnet_ids       = module.subnet.public_subnet_ids
   private_route_table_ids = module.subnet.private_route_table_ids
   project_name            = var.project_name

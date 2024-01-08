@@ -43,13 +43,13 @@ Installation
 6.  Generates a speculative execution plan.
 
     ```sh
-    $ terraform -chdir='envs/dev/' plan
+    $ terraform -chdir='envs/dev/' plan -var-file='./dev.tfvars'
     ```
 
 7.  Creates or updates infrastructure.
 
     ```sh
-    $ terraform -chdir='envs/dev/' apply -auto-approve
+    $ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve
     ```
 
 Cleanup
