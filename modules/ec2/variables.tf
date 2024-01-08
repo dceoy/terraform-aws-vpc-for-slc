@@ -1,0 +1,39 @@
+variable "private_subnet_id" {
+  description = "Private subnet ID"
+  type        = string
+}
+
+variable "security_group_ids" {
+  description = "Security group IDs"
+  type        = list(string)
+}
+
+variable "project_name" {
+  description = "Set the project name."
+  type        = string
+  default     = "slc"
+}
+
+variable "env_type" {
+  description = "Environment type"
+  type        = string
+  default     = "dev"
+}
+
+variable "image_id" {
+  description = "Set an EC2 AMI ID."
+  type        = string
+  default     = null
+}
+
+variable "instance_type" {
+  description = "Set an EC2 instance type."
+  type        = string
+  default     = "t4g.small"
+}
+
+variable "ebs_volume_size" {
+  description = "Set EBS volume size."
+  type        = number
+  default     = 32
+}

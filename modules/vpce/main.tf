@@ -1,27 +1,3 @@
-resource "aws_vpc_endpoint" "s3_gateway" {
-  vpc_id            = local.vpc_id
-  service_name      = "com.amazonaws.${local.region}.s3"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = var.private_route_table_ids
-  tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-gw-s3"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
-  }
-}
-
-resource "aws_vpc_endpoint" "dynamodb_gateway" {
-  vpc_id            = local.vpc_id
-  service_name      = "com.amazonaws.${local.region}.dynamodb"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = var.private_route_table_ids
-  tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-gw-dynamodb"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
-  }
-}
-
 resource "aws_vpc_endpoint" "ec2_interface" {
   vpc_id              = local.vpc_id
   service_name        = "com.amazonaws.${local.region}.ec2"

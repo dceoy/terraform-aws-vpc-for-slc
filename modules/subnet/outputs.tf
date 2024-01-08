@@ -18,6 +18,16 @@ output "private_route_table_ids" {
   value       = aws_route_table.private[*].id
 }
 
+output "s3_gateway_endpoint" {
+  description = "S3 gateway endpoint"
+  value       = aws_vpc_endpoint.s3_gateway.id
+}
+
+output "dynamodb_gateway_endpoint" {
+  description = "DynamoDB gateway endpoint"
+  value       = aws_vpc_endpoint.dynamodb_gateway.id
+}
+
 output "public_subnet_azs" {
   description = "Public subnet AZs"
   value       = aws_subnet.public[*].availability_zone

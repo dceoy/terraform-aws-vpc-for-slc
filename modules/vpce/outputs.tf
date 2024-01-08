@@ -1,13 +1,3 @@
-output "s3_gateway_endpoint" {
-  description = "S3 gateway endpoint"
-  value       = aws_vpc_endpoint.s3_gateway.id
-}
-
-output "dynamodb_gateway_endpoint" {
-  description = "DynamoDB gateway endpoint"
-  value       = aws_vpc_endpoint.dynamodb_gateway.id
-}
-
 output "ec2_interface_endpoint" {
   description = "EC2 interface endpoint"
   value       = aws_vpc_endpoint.ec2_interface.id

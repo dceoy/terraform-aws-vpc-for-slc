@@ -43,3 +43,6 @@ terraform.rc
 *.tfbackend.json
 !example.tfbackend
 !example.tfbackend.json
+
+# TLS private key files
+*.pem

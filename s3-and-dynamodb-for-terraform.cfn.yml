@@ -2,8 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: S3 bucket and DynamoDB table for Terraform
 Parameters:
-  ProjectName:
-    Description: Set the project name.
+  ResourcePrefix:
+    Description: Set the resource prefix.
     Type: String
     Default: tfstate
 Resources:
@@ -12,7 +12,7 @@ Resources:
     # DeletionPolicy: Retain
     # UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !Sub ${ProjectName}-${AWS::Region}-${AWS::AccountId}
+      BucketName: !Sub ${ResourcePrefix}-${AWS::Region}-${AWS::AccountId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -32,18 +32,18 @@ Resources:
               - TransitionInDays: 0
                 StorageClass: INTELLIGENT_TIERING
             NoncurrentVersionExpiration:
-              NoncurrentDays: 7
+              NoncurrentDays: 1
             AbortIncompleteMultipartUpload:
-              DaysAfterInitiation: 7
+              DaysAfterInitiation: 1
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}-${AWS::Region}-${AWS::AccountId}
-        - Key: ProjectName
-          Value: !Ref ProjectName
+          Value: !Sub ${ResourcePrefix}-${AWS::Region}-${AWS::AccountId}
+        - Key: Application
+          Value: Terraform
   TerraformLockDynamodbTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${ProjectName}-lock
+      TableName: !Sub ${ResourcePrefix}-lock
       TableClass: STANDARD
       AttributeDefinitions:
         - AttributeName: LockID
@@ -61,9 +61,9 @@ Resources:
         Enabled: false
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}-lock
-        - Key: ProjectName
-          Value: !Ref ProjectName
+          Value: !Sub ${ResourcePrefix}-lock
+        - Key: Application
+          Value: Terraform
 Outputs:
   TerraformStateS3Bucket:
     Value: !Ref TerraformStateS3Bucket

@@ -55,3 +55,33 @@ variable "create_nat_gateways" {
   type        = bool
   default     = true
 }
+
+variable "create_vpc_interface_endpoints" {
+  description = "Create VPC interface endpoints"
+  type        = bool
+  default     = true
+}
+
+variable "create_ec2_instance" {
+  description = "Create an EC2 instance"
+  type        = bool
+  default     = true
+}
+
+variable "image_id" {
+  description = "Set an EC2 AMI ID."
+  type        = string
+  default     = null
+}
+
+variable "instance_type" {
+  description = "Set an EC2 instance type."
+  type        = string
+  default     = "t4g.small"
+}
+
+variable "ebs_volume_size" {
+  description = "Set EBS volume size."
+  type        = number
+  default     = 32
+}
