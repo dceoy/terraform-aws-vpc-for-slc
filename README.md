@@ -28,25 +28,33 @@ Installation
 4.  Create configuration files.
 
     ```sh
-    $ vi dev.tfbackend.json
-    $ vi dev.tfvars.json
+    $ cp env/dev/example.tfbackend env/dev/dev.tfbackend
+    $ cp env/dev/example.tfvars env/dev/dev.tfvars
+    $ vi env/dev/dev.tfbackend
+    $ vi env/dev/dev.tfvars
     ```
 
 5.  Initialize a new Terraform working directory.
 
     ```sh
-    $ terraform -chdir='envs/dev/' init -reconfigure -backend-config='../../dev.tfbackend.json'
+    $ terraform -chdir='envs/dev/' init -reconfigure -backend-config='./dev.tfbackend'
     ```
 
 6.  Generates a speculative execution plan.
 
     ```sh
-    $ terraform -chdir='envs/dev/' plan -var-file='../../dev.tfvars.json'
+    $ terraform -chdir='envs/dev/' plan
+    ```
+
+7.  Creates or updates infrastructure.
+
+    ```sh
+    $ terraform -chdir='envs/dev/' apply -auto-approve
     ```
 
 Cleanup
 -------
 
 ```sh
-$ terraform -chdir='envs/dev/' plan -var-file='../../dev.tfvars.json' -destroy
+$ terraform -chdir='envs/dev/' plan -destroy
 ```
