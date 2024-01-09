@@ -19,3 +19,9 @@ variable "vpc_cidr_block" {
     error_message = "VPC CIDR block must be a valid CIDR block"
   }
 }
+
+variable "enable_vpc_flow_log" {
+  description = "Enable VPC flow log"
+  type        = bool
+  default     = true
+}

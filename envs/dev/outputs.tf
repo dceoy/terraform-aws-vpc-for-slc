@@ -13,6 +13,11 @@ output "vpc_default_network_acl_id" {
   value       = module.vpc.vpc_default_network_acl_id
 }
 
+output "vpc_default_route_table_id" {
+  description = "VPC default route table ID"
+  value       = module.vpc.vpc_default_route_table_id
+}
+
 output "vpc_cidr_block" {
   description = "VPC CIDR block"
   value       = module.vpc.vpc_cidr_block
@@ -33,6 +38,11 @@ output "vpc_flow_log_iam_role_arn" {
   value       = module.vpc.vpc_flow_log_iam_role_arn
 }
 
+output "vpc_flow_log_kms_key_arn" {
+  description = "VPC flow log KMS key ARN"
+  value       = module.vpc.vpc_flow_log_kms_key_arn
+}
+
 output "private_subnet_azs" {
   description = "Private subnet AZs"
   value       = module.subnet.private_subnet_azs
@@ -51,6 +61,11 @@ output "private_subnet_ids" {
 output "private_route_table_ids" {
   description = "Private route table IDs"
   value       = module.subnet.private_route_table_ids
+}
+
+output "private_security_group_id" {
+  description = "Private security group ID"
+  value       = module.subnet.private_security_group_id
 }
 
 output "s3_gateway_endpoint" {
@@ -78,9 +93,9 @@ output "public_subnet_ids" {
   value       = module.subnet.public_subnet_ids
 }
 
-output "public_route_table_id" {
-  description = "Public route table ID"
-  value       = module.subnet.public_route_table_id
+output "public_route_table_ids" {
+  description = "Public route table IDs"
+  value       = module.subnet.public_route_table_ids
 }
 
 output "internet_gateway_id" {
@@ -196,4 +211,9 @@ output "ec2_private_key_filename" {
 output "ec2_cloudwatch_log_group_name" {
   description = "EC2 CloudWatch log group name"
   value       = length(module.ec2) > 0 ? module.ec2[0].ec2_cloudwatch_log_group_name : null
+}
+
+output "ec2_ssm_kms_key_arn" {
+  description = "EC2 SSM KMS key ARN"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_ssm_kms_key_arn : null
 }

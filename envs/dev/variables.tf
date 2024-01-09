@@ -20,6 +20,12 @@ variable "vpc_cidr_block" {
   }
 }
 
+variable "enable_vpc_flow_log" {
+  description = "Enable VPC flow log"
+  type        = bool
+  default     = true
+}
+
 variable "private_subnet_count" {
   description = "Number of private subnets"
   type        = number

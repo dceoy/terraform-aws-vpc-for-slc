@@ -42,3 +42,8 @@ output "ec2_cloudwatch_log_group_name" {
   description = "EC2 CloudWatch log group name"
   value       = aws_cloudwatch_log_group.server.name
 }
+
+output "ec2_ssm_kms_key_arn" {
+  description = "EC2 SSM KMS key ARN"
+  value       = aws_kms_key.server.arn
+}

@@ -1,8 +1,9 @@
 module "vpc" {
-  source         = "../../modules/vpc"
-  project_name   = var.project_name
-  env_type       = var.env_type
-  vpc_cidr_block = var.vpc_cidr_block
+  source              = "../../modules/vpc"
+  project_name        = var.project_name
+  env_type            = var.env_type
+  vpc_cidr_block      = var.vpc_cidr_block
+  enable_vpc_flow_log = var.enable_vpc_flow_log
 }
 
 module "subnet" {
@@ -28,7 +29,7 @@ module "vpce" {
   source             = "../../modules/vpce"
   count              = var.create_vpc_interface_endpoints && var.private_subnet_count > 0 ? 1 : 0
   private_subnet_ids = module.subnet.private_subnet_ids
-  security_group_ids = [module.vpc.vpc_default_security_group_id]
+  security_group_ids = [module.subnet.private_security_group_id]
   project_name       = var.project_name
   env_type           = var.env_type
 }
@@ -37,7 +38,7 @@ module "ec2" {
   source             = "../../modules/ec2"
   count              = var.create_ec2_instance && var.private_subnet_count > 0 ? 1 : 0
   private_subnet_id  = module.subnet.private_subnet_ids[0]
-  security_group_ids = [module.vpc.vpc_default_security_group_id]
+  security_group_ids = [module.subnet.private_security_group_id]
   project_name       = var.project_name
   env_type           = var.env_type
   image_id           = var.image_id

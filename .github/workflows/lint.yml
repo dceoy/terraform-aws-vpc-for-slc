@@ -40,3 +40,6 @@ jobs:
       - name: Execute tflint
         run: |
           tflint --recursive
+      - name: Execute tfsec
+        run: |
+          tfsec .

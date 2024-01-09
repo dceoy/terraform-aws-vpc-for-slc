@@ -56,5 +56,5 @@ Cleanup
 -------
 
 ```sh
-$ terraform -chdir='envs/dev/' plan -destroy
+$ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve -destroy
 ```

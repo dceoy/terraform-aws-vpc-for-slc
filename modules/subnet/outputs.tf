@@ -18,14 +18,19 @@ output "private_route_table_ids" {
   value       = aws_route_table.private[*].id
 }
 
+output "private_security_group_id" {
+  description = "Private security group ID"
+  value       = length(aws_security_group.private) > 0 ? aws_security_group.private[0].id : null
+}
+
 output "s3_gateway_endpoint" {
   description = "S3 gateway endpoint"
-  value       = aws_vpc_endpoint.s3_gateway.id
+  value       = length(aws_vpc_endpoint.s3_gateway) > 0 ? aws_vpc_endpoint.s3_gateway[0].id : null
 }
 
 output "dynamodb_gateway_endpoint" {
   description = "DynamoDB gateway endpoint"
-  value       = aws_vpc_endpoint.dynamodb_gateway.id
+  value       = length(aws_vpc_endpoint.dynamodb_gateway) > 0 ? aws_vpc_endpoint.dynamodb_gateway[0].id : null
 }
 
 output "public_subnet_azs" {
@@ -43,12 +48,12 @@ output "public_subnet_ids" {
   value       = aws_subnet.public[*].id
 }
 
-output "public_route_table_id" {
-  description = "Public route table ID"
-  value       = aws_route_table.public.id
+output "public_route_table_ids" {
+  description = "Public route table IDs"
+  value       = aws_route_table.public[*].id
 }
 
 output "internet_gateway_id" {
   description = "Internet gateway ID"
-  value       = aws_internet_gateway.public.id
+  value       = length(aws_internet_gateway.public) > 0 ? aws_internet_gateway.public[0].id : null
 }
