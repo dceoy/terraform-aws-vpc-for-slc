@@ -5,7 +5,7 @@ resource "aws_subnet" "private" {
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = false
   tags = {
-    Application = "${var.project_name}-${var.env_type}-subnet-private${count.index}"
+    Application = "${var.project_name}-${var.env_type}-subnet-private${count.index}-${local.private_subnet_azs[count.index]}"
     Network     = "Private"
     Name        = "${var.project_name}-${var.env_type}-subnet-private${count.index}-${local.private_subnet_azs[count.index]}"
     ProjectName = var.project_name
@@ -91,7 +91,7 @@ resource "aws_subnet" "public" {
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = true
   tags = {
-    Application = "${var.project_name}-${var.env_type}-subnet-public${count.index}"
+    Application = "${var.project_name}-${var.env_type}-subnet-public${count.index}-${local.public_subnet_azs[count.index]}"
     Network     = "Public"
     Name        = "${var.project_name}-${var.env_type}-subnet-public${count.index}-${local.public_subnet_azs[count.index]}"
     ProjectName = var.project_name
