@@ -33,9 +33,9 @@ output "ec2_key_pair_name" {
   value       = aws_key_pair.server.key_name
 }
 
-output "ec2_private_key_filename" {
-  description = "EC2 private key file name"
-  value       = local_file.server.filename
+output "ec2_private_key_name" {
+  description = "EC2 private key name"
+  value       = aws_ssm_parameter.server.name
 }
 
 output "ec2_cloudwatch_log_group_name" {

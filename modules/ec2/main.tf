@@ -120,15 +120,15 @@ resource "aws_key_pair" "server" {
   }
 }
 
+resource "aws_ssm_parameter" "server" {
+  name  = "/ec2/private-key-pem/${var.project_name}-${var.env_type}-ec2-key-pair"
+  type  = "SecureString"
+  value = tls_private_key.server.private_key_pem
+}
+
 resource "tls_private_key" "server" {
   algorithm = "RSA"
   rsa_bits  = 4096
-}
-
-resource "local_file" "server" {
-  filename        = "${var.project_name}-${var.env_type}-ec2-key-pair.pem"
-  content         = tls_private_key.server.private_key_pem
-  file_permission = "0600"
 }
 
 resource "aws_cloudwatch_log_group" "server" {

@@ -40,7 +40,7 @@ Installation
     $ terraform -chdir='envs/dev/' init -reconfigure -backend-config='./aws.tfbackend'
     ```
 
-6.  Generates a speculative execution plan.
+6.  Generates a speculative execution plan. (Optional)
 
     ```sh
     $ terraform -chdir='envs/dev/' plan -var-file='./dev.tfvars'
@@ -50,6 +50,21 @@ Installation
 
     ```sh
     $ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve
+    ```
+
+8.  Retrieve the private key of an EC2 instance and log in to it. (Optional)
+
+    ```sh
+    $ aws ssm get-parameter \
+        --name "$(terraform -chdir='envs/dev/' output -raw ec2_private_key_name)" \
+        --with-decryption \
+        | jq -r .Parameter.Value \
+        > slc-dev-ec2-key-pair.pem
+    $ chmod 600 slc-dev-ec2-key-pair.pem
+    $ ssh \
+        -o ProxyCommand="aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'" \
+        -i slc-dev-ec2-key-pair.pem \
+        "ec2-user@$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
     ```
 
 Cleanup

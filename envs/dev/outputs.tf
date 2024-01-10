@@ -203,9 +203,9 @@ output "ec2_key_pair_name" {
   value       = length(module.ec2) > 0 ? module.ec2[0].ec2_key_pair_name : null
 }
 
-output "ec2_private_key_filename" {
-  description = "EC2 private key file name"
-  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_private_key_filename : null
+output "ec2_private_key_name" {
+  description = "EC2 private key name"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_private_key_name : null
 }
 
 output "ec2_cloudwatch_log_group_name" {
