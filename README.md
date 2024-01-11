@@ -52,11 +52,20 @@ Installation
     $ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve
     ```
 
-8.  Retrieve the private key of an EC2 instance and log in to it. (Optional)
+8.  Use the EC2 instance. (Optional)
+
+    Option 1:   Start a session using AWS CLI.
+
+    ```sh
+    $ aws ssm start-session \
+        --target "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
+    ```
+
+    Option 2:   Start an SSH session using AWS CLI and SSH.
 
     ```sh
     $ aws ssm get-parameter \
-        --name "$(terraform -chdir='envs/dev/' output -raw ec2_private_key_name)" \
+        --name "/ec2/private-key-pem/$(terraform -chdir='envs/dev/' output -raw ec2_key_pair_name)" \
         --with-decryption \
         | jq -r .Parameter.Value \
         > slc-dev-ec2-key-pair.pem

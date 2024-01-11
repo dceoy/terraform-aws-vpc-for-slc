@@ -45,3 +45,10 @@ module "ec2" {
   instance_type      = var.instance_type
   ebs_volume_size    = var.ebs_volume_size
 }
+
+module "ssm" {
+  source       = "../../modules/ssm"
+  count        = length(module.ec2) > 0 ? 1 : 0
+  project_name = var.project_name
+  env_type     = var.env_type
+}

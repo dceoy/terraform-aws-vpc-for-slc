@@ -199,21 +199,21 @@ output "ec2_instance_profile_arn" {
 }
 
 output "ec2_key_pair_name" {
-  description = "EC2 key pair ID"
+  description = "EC2 key pair name"
   value       = length(module.ec2) > 0 ? module.ec2[0].ec2_key_pair_name : null
 }
 
-output "ec2_private_key_name" {
-  description = "EC2 private key name"
-  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_private_key_name : null
+output "ssm_session_document_name" {
+  description = "SSM session document name"
+  value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_document_name : null
 }
 
-output "ec2_cloudwatch_log_group_name" {
-  description = "EC2 CloudWatch log group name"
-  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_cloudwatch_log_group_name : null
+output "ssm_session_cloudwatch_log_group_name" {
+  description = "SSM session CloudWatch log group name"
+  value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_cloudwatch_log_group_name : null
 }
 
-output "ec2_ssm_kms_key_arn" {
-  description = "EC2 SSM KMS key ARN"
-  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_ssm_kms_key_arn : null
+output "ssm_session_kms_key_arn" {
+  description = "SSM session KMS key ARN"
+  value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_kms_key_arn : null
 }
