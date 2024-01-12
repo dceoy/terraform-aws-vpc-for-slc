@@ -20,8 +20,8 @@ resource "aws_ssm_document" "session" {
       cloudWatchStreamingEnabled  = true
       kmsKeyId                    = aws_kms_key.session.arn
       idleSessionTimeout          = "20"
-      runAsEnabled = true
-      runAsDefaultUser = "ec2-user"
+      runAsEnabled                = true
+      runAsDefaultUser            = "ec2-user"
       shellProfile = {
         linux = "cd && exec bash -l"
       }

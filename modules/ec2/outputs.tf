@@ -30,5 +30,5 @@ output "ec2_instance_profile_arn" {
 
 output "ec2_key_pair_name" {
   description = "EC2 key pair name"
-  value       = aws_key_pair.server.key_name
+  value       = length(aws_key_pair.server) > 0 ? aws_key_pair.server[0].key_name : null
 }

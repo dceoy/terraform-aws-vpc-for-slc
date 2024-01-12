@@ -44,11 +44,12 @@ module "ec2" {
   image_id           = var.image_id
   instance_type      = var.instance_type
   ebs_volume_size    = var.ebs_volume_size
+  use_ssh            = var.use_ssh
 }
 
 module "ssm" {
   source                = "../../modules/ssm"
-  count                 = length(module.ec2) > 0 ? 1 : 0
+  count                 = length(module.ec2) > 0 && !var.use_ssh ? 1 : 0
   ec2_instance_role_arn = module.ec2[count.index].ec2_instance_role_arn
   project_name          = var.project_name
   env_type              = var.env_type

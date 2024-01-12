@@ -19,7 +19,7 @@ resource "aws_cloudwatch_log_group" "flow_log" {
   count             = var.enable_vpc_flow_log ? 1 : 0
   name              = local.vpc_flow_log_cloudwatch_log_group_name
   retention_in_days = 14
-  kms_key_id        = aws_kms_key.flow_log[0].arn
+  kms_key_id        = aws_kms_key.flow_log[count.index].arn
   tags = {
     Name        = "${aws_vpc.main.tags.Name}-flow-log-group"
     ProjectName = var.project_name
@@ -75,14 +75,14 @@ resource "aws_kms_key" "flow_log" {
 
 resource "aws_kms_alias" "flow_log" {
   count         = length(aws_kms_key.flow_log) > 0 ? 1 : 0
-  name          = "alias/${aws_kms_key.flow_log[0].tags.Name}"
-  target_key_id = aws_kms_key.flow_log[0].key_id
+  name          = "alias/${aws_kms_key.flow_log[count.index].tags.Name}"
+  target_key_id = aws_kms_key.flow_log[count.index].key_id
 }
 
 resource "aws_flow_log" "flow_log" {
   count           = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  iam_role_arn    = aws_iam_role.flow_log[0].arn
-  log_destination = aws_cloudwatch_log_group.flow_log[0].arn
+  iam_role_arn    = aws_iam_role.flow_log[count.index].arn
+  log_destination = aws_cloudwatch_log_group.flow_log[count.index].arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.main.id
   tags = {

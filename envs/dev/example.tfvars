@@ -13,3 +13,4 @@ create_ec2_instance            = true
 image_id                       = "ami-06a2375cfef712d1b"
 instance_type                  = "t4g.small"
 ebs_volume_size                = 32
+use_ssh                        = false

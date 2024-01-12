@@ -55,9 +55,9 @@ Installation
 Usage
 -----
 
-1.  Use the EC2 instance.
+1.  Use the EC2 instance. (`create_ec2_instance = true`)
 
-    Option 1:   Start a session and log session data using Amazon CloudWatch Logs.
+    Option 1:   Start a session and log session data using Amazon CloudWatch Logs. (`use_ssh = false`)
 
     ```sh
     $ aws ssm start-session \
@@ -65,7 +65,7 @@ Usage
         --target "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
     ```
 
-    Option 2:   Start a session using SSH.
+    Option 2:   Start a session using SSH. (`use_ssh = true`)
 
     ```sh
     $ aws ssm get-parameter \

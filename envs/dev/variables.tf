@@ -103,3 +103,9 @@ variable "ebs_volume_size" {
   type        = number
   default     = 32
 }
+
+variable "use_ssh" {
+  description = "Use SSH with a key pair."
+  type        = bool
+  default     = false
+}

@@ -33,7 +33,7 @@ resource "aws_launch_template" "server" {
   }
   image_id      = local.image_id
   instance_type = var.instance_type
-  key_name      = aws_key_pair.server.key_name
+  key_name      = length(aws_key_pair.server) > 0 ? aws_key_pair.server[0].key_name : null
   network_interfaces {
     network_interface_id = aws_network_interface.server.id
     device_index         = 0
@@ -94,8 +94,9 @@ resource "aws_iam_role" "server" {
 }
 
 resource "aws_key_pair" "server" {
+  count      = length(tls_private_key.server) > 0 ? 1 : 0
   key_name   = "${var.project_name}-${var.env_type}-ec2-key-pair"
-  public_key = tls_private_key.server.public_key_openssh
+  public_key = tls_private_key.server[count.index].public_key_openssh
   tags = {
     Name        = "${var.project_name}-${var.env_type}-ec2-key-pair"
     ProjectName = var.project_name
@@ -104,12 +105,14 @@ resource "aws_key_pair" "server" {
 }
 
 resource "aws_ssm_parameter" "server" {
-  name  = "/ec2/private-key-pem/${aws_key_pair.server.key_name}"
+  count = length(tls_private_key.server) > 0 ? 1 : 0
+  name  = "/ec2/private-key-pem/${aws_key_pair.server[count.index].key_name}"
   type  = "SecureString"
-  value = tls_private_key.server.private_key_pem
+  value = tls_private_key.server[count.index].private_key_pem
 }
 
 resource "tls_private_key" "server" {
+  count     = var.use_ssh ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
