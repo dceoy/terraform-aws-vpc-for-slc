@@ -37,7 +37,7 @@ module "vpce" {
 module "ec2" {
   source             = "../../modules/ec2"
   count              = var.create_ec2_instance && var.private_subnet_count > 0 ? 1 : 0
-  private_subnet_id  = module.subnet.private_subnet_ids[0]
+  private_subnet_id  = module.subnet.private_subnet_ids[count.index]
   security_group_ids = [module.subnet.private_security_group_id]
   project_name       = var.project_name
   env_type           = var.env_type
@@ -47,8 +47,9 @@ module "ec2" {
 }
 
 module "ssm" {
-  source       = "../../modules/ssm"
-  count        = length(module.ec2) > 0 ? 1 : 0
-  project_name = var.project_name
-  env_type     = var.env_type
+  source                = "../../modules/ssm"
+  count                 = length(module.ec2) > 0 ? 1 : 0
+  ec2_instance_role_arn = module.ec2[count.index].ec2_instance_role_arn
+  project_name          = var.project_name
+  env_type              = var.env_type
 }

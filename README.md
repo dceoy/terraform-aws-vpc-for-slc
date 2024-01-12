@@ -52,16 +52,20 @@ Installation
     $ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve
     ```
 
-8.  Use the EC2 instance. (Optional)
+Usage
+-----
 
-    Option 1:   Start a session using AWS CLI.
+1.  Use the EC2 instance.
+
+    Option 1:   Start a session and log session data using Amazon CloudWatch Logs.
 
     ```sh
     $ aws ssm start-session \
+        --document-name "$(terraform -chdir='envs/dev/' output -raw ssm_session_document_name)" \
         --target "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
     ```
 
-    Option 2:   Start an SSH session using AWS CLI and SSH.
+    Option 2:   Start a session using SSH.
 
     ```sh
     $ aws ssm get-parameter \

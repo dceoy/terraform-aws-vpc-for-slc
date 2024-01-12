@@ -1,5 +1,13 @@
+locals {
+  ssm_session_document_name = "${var.project_name}-${var.env_type}-ssm-session-document"
+}
+
+locals {
+  ssm_session_cloudwatch_log_group_name = "/aws/ssm/session/${local.ssm_session_document_name}"
+}
+
 resource "aws_ssm_document" "session" {
-  name            = "${var.project_name}-${var.env_type}-ssm-session-document"
+  name            = local.ssm_session_document_name
   document_type   = "Session"
   document_format = "JSON"
   content = jsonencode({
@@ -10,32 +18,29 @@ resource "aws_ssm_document" "session" {
       cloudWatchLogGroupName      = aws_cloudwatch_log_group.session.name
       cloudWatchEncryptionEnabled = true
       cloudWatchStreamingEnabled  = true
-      idleSessionTimeout          = 20
-      # s3BucketName = "DOC-EXAMPLE-BUCKET"
-      # s3KeyPrefix = "MyBucketPrefix"
-      # s3EncryptionEnabled = true
-      # kmsKeyId = "MyKMSKeyID"
-      # runAsEnabled = false
-      # runAsDefaultUser = "MyDefaultRunAsUser"
-      # shellProfile = {
-      #   windows = "example commands"
-      #   linux = "example commands"
-      # }
+      kmsKeyId                    = aws_kms_key.session.arn
+      idleSessionTimeout          = "20"
+      runAsEnabled = true
+      runAsDefaultUser = "ec2-user"
+      shellProfile = {
+        linux = "cd && exec bash -l"
+      }
     }
   })
+  target_type = "/AWS::SSM::ManagedInstance"
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ssm-session-document"
+    Name        = local.ssm_session_document_name
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
 }
 
 resource "aws_cloudwatch_log_group" "session" {
-  name              = "/aws/ssm/session/${var.project_name}-${var.env_type}-ssm"
+  name              = local.ssm_session_cloudwatch_log_group_name
   retention_in_days = 14
   kms_key_id        = aws_kms_key.session.arn
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ssm-session-log-group"
+    Name        = "${local.ssm_session_document_name}-log-group"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
@@ -72,15 +77,15 @@ resource "aws_kms_key" "session" {
         ],
         Resource = "*",
         Condition = {
-          ArnLike = {
-            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:*"
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:${local.ssm_session_cloudwatch_log_group_name}"
           }
         }
       }
     ]
   })
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ssm-session-log-kms-key"
+    Name        = "${local.ssm_session_document_name}-log-kms-key"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
@@ -89,4 +94,42 @@ resource "aws_kms_key" "session" {
 resource "aws_kms_alias" "session" {
   name          = "alias/${aws_kms_key.session.tags.Name}"
   target_key_id = aws_kms_key.session.arn
+}
+
+# tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "session" {
+  name = "${local.ssm_session_document_name}-log-policy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "kms:Decrypt"
+        ],
+        Effect   = "Allow",
+        Resource = [aws_kms_key.session.arn]
+      },
+      {
+        Action = [
+          # "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ],
+        Effect   = "Allow",
+        Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+      }
+    ]
+  })
+  tags = {
+    Name        = "${local.ssm_session_document_name}-log-policy"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "session" {
+  role       = element(split("/", var.ec2_instance_role_arn), 1)
+  policy_arn = aws_iam_policy.session.arn
 }

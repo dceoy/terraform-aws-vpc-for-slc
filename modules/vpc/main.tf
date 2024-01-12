@@ -11,68 +11,17 @@ resource "aws_vpc" "main" {
   }
 }
 
+locals {
+  vpc_flow_log_cloudwatch_log_group_name = "/aws/vpc/flow-logs/${aws_vpc.main.tags.Name}"
+}
+
 resource "aws_cloudwatch_log_group" "flow_log" {
   count             = var.enable_vpc_flow_log ? 1 : 0
-  name              = "/aws/vpc/flow-logs/${aws_vpc.main.id}"
+  name              = local.vpc_flow_log_cloudwatch_log_group_name
   retention_in_days = 14
   kms_key_id        = aws_kms_key.flow_log[0].arn
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpc-flow-log-group"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
-  }
-}
-
-resource "aws_flow_log" "flow_log" {
-  count           = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  iam_role_arn    = aws_iam_role.flow_log[0].arn
-  log_destination = aws_cloudwatch_log_group.flow_log[0].arn
-  traffic_type    = "ALL"
-  vpc_id          = aws_vpc.main.id
-  tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpc-flow-log"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
-  }
-}
-
-resource "aws_iam_role" "flow_log" {
-  count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  name  = "${var.project_name}-${var.env_type}-vpc-flow-log-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = ["sts:AssumeRole"],
-        Effect = "Allow",
-        Principal = {
-          Service = "vpc-flow-logs.amazonaws.com"
-        }
-      }
-    ]
-  })
-  inline_policy {
-    name = "${var.project_name}-${var.env_type}-vpc-flow-log-role-policy"
-    policy = jsonencode({
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Action = [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:DescribeLogGroups",
-            "logs:DescribeLogStreams"
-          ],
-          Effect   = "Allow",
-          Resource = [aws_cloudwatch_log_group.flow_log[0].arn]
-        }
-      ]
-    })
-  }
-  path = "/"
-  tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpc-flow-log-role"
+    Name        = "${aws_vpc.main.tags.Name}-flow-log-group"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
@@ -110,15 +59,15 @@ resource "aws_kms_key" "flow_log" {
         ],
         Resource = "*",
         Condition = {
-          ArnLike = {
-            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:*"
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name}"
           }
         }
       }
     ]
   })
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpc-flow-log-kms-key"
+    Name        = "${aws_vpc.main.tags.Name}-flow-log-kms-key"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
@@ -126,6 +75,62 @@ resource "aws_kms_key" "flow_log" {
 
 resource "aws_kms_alias" "flow_log" {
   count         = length(aws_kms_key.flow_log) > 0 ? 1 : 0
-  name          = "alias/${var.project_name}-${var.env_type}-vpc-flow-log-kms-key"
+  name          = "alias/${aws_kms_key.flow_log[0].tags.Name}"
   target_key_id = aws_kms_key.flow_log[0].key_id
+}
+
+resource "aws_flow_log" "flow_log" {
+  count           = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
+  iam_role_arn    = aws_iam_role.flow_log[0].arn
+  log_destination = aws_cloudwatch_log_group.flow_log[0].arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
+  tags = {
+    Name        = "${aws_vpc.main.tags.Name}-flow-log"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
+}
+
+# tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_role" "flow_log" {
+  count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
+  name  = "${aws_vpc.main.tags.Name}-flow-log-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = ["sts:AssumeRole"],
+        Effect = "Allow",
+        Principal = {
+          Service = "vpc-flow-logs.amazonaws.com"
+        }
+      }
+    ]
+  })
+  inline_policy {
+    name = "${aws_vpc.main.tags.Name}-flow-log-role-policy"
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Action = [
+            # "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogGroups",
+            "logs:DescribeLogStreams"
+          ],
+          Effect   = "Allow",
+          Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+        }
+      ]
+    })
+  }
+  path = "/"
+  tags = {
+    Name        = "${aws_vpc.main.tags.Name}-flow-log-role"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
 }
