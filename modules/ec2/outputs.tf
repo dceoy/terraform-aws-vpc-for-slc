@@ -30,5 +30,10 @@ output "ec2_instance_profile_arn" {
 
 output "ec2_key_pair_name" {
   description = "EC2 key pair name"
-  value       = length(aws_key_pair.server) > 0 ? aws_key_pair.server[0].key_name : null
+  value       = length(aws_key_pair.ssh) > 0 ? aws_key_pair.ssh[0].key_name : null
+}
+
+output "ec2_ssm_ssh_iam_role_arn" {
+  description = "EC2 SSM SSH IAM role ARN"
+  value       = length(aws_iam_role.client) > 0 ? aws_iam_role.client[0].arn : null
 }

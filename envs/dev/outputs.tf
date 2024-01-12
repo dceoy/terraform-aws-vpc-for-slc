@@ -203,6 +203,11 @@ output "ec2_key_pair_name" {
   value       = length(module.ec2) > 0 ? module.ec2[0].ec2_key_pair_name : null
 }
 
+output "ec2_ssm_ssh_iam_role_arn" {
+  description = "EC2 SSM SSH IAM role ARN"
+  value       = length(module.ec2) > 0 ? module.ec2[0].ec2_ssm_ssh_iam_role_arn : null
+}
+
 output "ssm_session_document_name" {
   description = "SSM session document name"
   value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_document_name : null
@@ -216,4 +221,14 @@ output "ssm_session_cloudwatch_log_group_name" {
 output "ssm_session_kms_key_arn" {
   description = "SSM session KMS key ARN"
   value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_kms_key_arn : null
+}
+
+output "ssm_session_log_iam_policy_arn" {
+  description = "SSM session log IAM policy ARN"
+  value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_log_iam_policy_arn : null
+}
+
+output "ssm_session_start_iam_role_arn" {
+  description = "SSM session start IAM role ARN"
+  value       = length(module.ssm) > 0 ? module.ssm[0].ssm_session_start_iam_role_arn : null
 }

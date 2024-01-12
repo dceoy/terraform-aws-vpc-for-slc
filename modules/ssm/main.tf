@@ -1,11 +1,3 @@
-locals {
-  ssm_session_document_name = "${var.project_name}-${var.env_type}-ssm-session-document"
-}
-
-locals {
-  ssm_session_cloudwatch_log_group_name = "/aws/ssm/session/${local.ssm_session_document_name}"
-}
-
 resource "aws_ssm_document" "session" {
   name            = local.ssm_session_document_name
   document_type   = "Session"
@@ -103,9 +95,7 @@ resource "aws_iam_policy" "session" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = [
-          "kms:Decrypt"
-        ],
+        Action   = ["kms:Decrypt"],
         Effect   = "Allow",
         Resource = [aws_kms_key.session.arn]
       },
@@ -122,6 +112,7 @@ resource "aws_iam_policy" "session" {
       }
     ]
   })
+  path = "/"
   tags = {
     Name        = "${local.ssm_session_document_name}-log-policy"
     ProjectName = var.project_name
@@ -132,4 +123,47 @@ resource "aws_iam_policy" "session" {
 resource "aws_iam_role_policy_attachment" "session" {
   role       = element(split("/", var.ec2_instance_role_arn), 1)
   policy_arn = aws_iam_policy.session.arn
+}
+
+resource "aws_iam_role" "client" {
+  name = "${local.ssm_session_document_name}-start-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["sts:AssumeRole"]
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+  inline_policy {
+    name = "${local.ssm_session_document_name}-start-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action = ["ssm:StartSession"]
+          Effect = "Allow"
+          Resource = [
+            var.ec2_instance_role_arn,
+            aws_ssm_document.session.arn
+          ]
+          Condition = {
+            BoolIfExists = {
+              "ssm:SessionDocumentAccessCheck" = "true"
+            }
+          }
+        }
+      ]
+    })
+  }
+  path = "/"
+  tags = {
+    Name        = "${local.ssm_session_document_name}-start-role"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
 }

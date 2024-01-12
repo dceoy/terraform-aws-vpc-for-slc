@@ -33,7 +33,7 @@ resource "aws_launch_template" "server" {
   }
   image_id      = local.image_id
   instance_type = var.instance_type
-  key_name      = length(aws_key_pair.server) > 0 ? aws_key_pair.server[0].key_name : null
+  key_name      = length(aws_key_pair.ssh) > 0 ? aws_key_pair.ssh[0].key_name : null
   network_interfaces {
     network_interface_id = aws_network_interface.server.id
     device_index         = 0
@@ -93,10 +93,10 @@ resource "aws_iam_role" "server" {
   }
 }
 
-resource "aws_key_pair" "server" {
-  count      = length(tls_private_key.server) > 0 ? 1 : 0
+resource "aws_key_pair" "ssh" {
+  count      = length(tls_private_key.ssh) > 0 ? 1 : 0
   key_name   = "${var.project_name}-${var.env_type}-ec2-key-pair"
-  public_key = tls_private_key.server[count.index].public_key_openssh
+  public_key = tls_private_key.ssh[count.index].public_key_openssh
   tags = {
     Name        = "${var.project_name}-${var.env_type}-ec2-key-pair"
     ProjectName = var.project_name
@@ -104,15 +104,59 @@ resource "aws_key_pair" "server" {
   }
 }
 
-resource "aws_ssm_parameter" "server" {
-  count = length(tls_private_key.server) > 0 ? 1 : 0
-  name  = "/ec2/private-key-pem/${aws_key_pair.server[count.index].key_name}"
+resource "aws_ssm_parameter" "ssh" {
+  count = length(tls_private_key.ssh) > 0 ? 1 : 0
+  name  = "/ec2/private-key-pem/${aws_key_pair.ssh[count.index].key_name}"
   type  = "SecureString"
-  value = tls_private_key.server[count.index].private_key_pem
+  value = tls_private_key.ssh[count.index].private_key_pem
 }
 
-resource "tls_private_key" "server" {
+resource "tls_private_key" "ssh" {
   count     = var.use_ssh ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
+}
+
+resource "aws_iam_role" "client" {
+  count = length(tls_private_key.ssh) > 0 ? 1 : 0
+  name  = "${aws_instance.server.tags.Name}-ssm-ssh-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["sts:AssumeRole"]
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+  inline_policy {
+    name = "${aws_instance.server.tags.Name}-ssm-ssh-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action = ["ssm:StartSession"]
+          Effect = "Allow"
+          Resource = [
+            aws_instance.server.arn,
+            "arn:aws:ssm:${local.region}:${local.account_id}:document/AWS-StartSSHSession"
+          ]
+          Condition = {
+            BoolIfExists = {
+              "ssm:SessionDocumentAccessCheck" = "true"
+            }
+          }
+        }
+      ]
+    })
+  }
+  path = "/"
+  tags = {
+    Name        = "${aws_instance.server.tags.Name}-ssm-ssh-role"
+    ProjectName = var.project_name
+    EnvType     = var.env_type
+  }
 }

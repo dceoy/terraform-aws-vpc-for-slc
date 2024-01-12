@@ -3,16 +3,12 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Application = "${var.project_name}-${var.env_type}-vpc"
+    Application = local.vpc_name
     Network     = "Public"
-    Name        = "${var.project_name}-${var.env_type}-vpc"
+    Name        = local.vpc_name
     ProjectName = var.project_name
     EnvType     = var.env_type
   }
-}
-
-locals {
-  vpc_flow_log_cloudwatch_log_group_name = "/aws/vpc/flow-logs/${aws_vpc.main.tags.Name}"
 }
 
 resource "aws_cloudwatch_log_group" "flow_log" {

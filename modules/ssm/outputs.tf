@@ -13,7 +13,12 @@ output "ssm_session_kms_key_arn" {
   value       = aws_kms_key.session.arn
 }
 
-output "ssm_session_iam_policy_arn" {
+output "ssm_session_log_iam_policy_arn" {
   description = "SSM session IAM policy ARN"
   value       = aws_iam_policy.session.arn
+}
+
+output "ssm_session_start_iam_role_arn" {
+  description = "SSM session start IAM role ARN"
+  value       = aws_iam_role.client.arn
 }
