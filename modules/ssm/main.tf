@@ -90,7 +90,7 @@ resource "aws_kms_alias" "session" {
 
 # tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "session" {
-  name = "${local.ssm_session_document_name}-log-policy"
+  name = "${aws_ssm_document.session.name}-log-policy"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -114,55 +114,7 @@ resource "aws_iam_policy" "session" {
   })
   path = "/"
   tags = {
-    Name        = "${local.ssm_session_document_name}-log-policy"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "session" {
-  role       = element(split("/", var.ec2_instance_role_arn), 1)
-  policy_arn = aws_iam_policy.session.arn
-}
-
-resource "aws_iam_role" "client" {
-  name = "${local.ssm_session_document_name}-start-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = ["sts:AssumeRole"]
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-  inline_policy {
-    name = "${local.ssm_session_document_name}-start-policy"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = ["ssm:StartSession"]
-          Effect = "Allow"
-          Resource = [
-            var.ec2_instance_role_arn,
-            aws_ssm_document.session.arn
-          ]
-          Condition = {
-            BoolIfExists = {
-              "ssm:SessionDocumentAccessCheck" = "true"
-            }
-          }
-        }
-      ]
-    })
-  }
-  path = "/"
-  tags = {
-    Name        = "${local.ssm_session_document_name}-start-role"
+    Name        = "${aws_ssm_document.session.name}-log-policy"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }

@@ -8,6 +8,24 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
+variable "ssm_session_document_name" {
+  description = "SSM session document name"
+  type        = string
+  default     = null
+}
+
+variable "ssm_session_kms_key_arn" {
+  description = "SSM session KMS key ARN"
+  type        = string
+  default     = null
+}
+
+variable "ssm_session_log_iam_policy_arn" {
+  description = "SSM session log IAM policy ARN"
+  type        = string
+  default     = null
+}
+
 variable "project_name" {
   description = "Set the project name."
   type        = string
@@ -36,10 +54,4 @@ variable "ebs_volume_size" {
   description = "Set EBS volume size."
   type        = number
   default     = 32
-}
-
-variable "use_ssh" {
-  description = "Use SSH with a key pair."
-  type        = bool
-  default     = false
 }

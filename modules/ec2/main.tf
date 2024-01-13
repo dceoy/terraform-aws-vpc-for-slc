@@ -9,10 +9,11 @@ resource "aws_instance" "server" {
   metadata_options {
     http_tokens = "required"
   }
-  user_data = <<-EOF
-              #!/usr/bin/env bash
-              sudo sh -c 'dnf -y upgrade && dnf clean all && rm -rf /var/cache/dnf'
-              EOF
+  user_data         = <<-EOF
+                      #!/usr/bin/env bash
+                      sudo sh -c 'dnf -y upgrade && dnf clean all && rm -rf /var/cache/dnf'
+                      EOF
+  source_dest_check = true
   tags = {
     Name        = "${var.project_name}-${var.env_type}-ec2-instance"
     ProjectName = var.project_name
@@ -56,8 +57,8 @@ resource "aws_launch_template" "server" {
 
 resource "aws_network_interface" "server" {
   subnet_id         = var.private_subnet_id
-  source_dest_check = false
   security_groups   = var.security_group_ids
+  source_dest_check = true
   tags = {
     Name        = "${var.project_name}-${var.env_type}-ec2-network-interface"
     ProjectName = var.project_name
@@ -77,7 +78,7 @@ resource "aws_iam_role" "server" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = "sts:AssumeRole",
+        Action = ["sts:AssumeRole"],
         Effect = "Allow",
         Principal = {
           Service = "ec2.amazonaws.com"
@@ -85,12 +86,21 @@ resource "aws_iam_role" "server" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  path                = "/"
+  managed_policy_arns = concat(
+    ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
+    var.ssm_session_log_iam_policy_arn != null ? [var.ssm_session_log_iam_policy_arn] : []
+  )
+  path = "/"
   tags = {
     Name    = "${var.project_name}-${var.env_type}-ec2-instance-role"
     EnvType = var.env_type
   }
+}
+
+resource "tls_private_key" "ssh" {
+  count     = var.ssm_session_document_name == null ? 1 : 0
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "ssh" {
@@ -111,15 +121,15 @@ resource "aws_ssm_parameter" "ssh" {
   value = tls_private_key.ssh[count.index].private_key_pem
 }
 
-resource "tls_private_key" "ssh" {
-  count     = var.use_ssh ? 1 : 0
-  algorithm = "RSA"
-  rsa_bits  = 4096
+resource "aws_ssm_parameter" "server" {
+  name  = "/ec2/instance-id/${aws_instance.server.tags.Name}"
+  type  = "String"
+  value = aws_instance.server.id
 }
 
-resource "aws_iam_role" "client" {
-  count = length(tls_private_key.ssh) > 0 ? 1 : 0
-  name  = "${aws_instance.server.tags.Name}-ssm-ssh-role"
+resource "aws_iam_role" "session" {
+  count = var.ssm_session_document_name != null ? 1 : 0
+  name  = "${aws_instance.server.tags.Name}-ssm-session-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -127,13 +137,13 @@ resource "aws_iam_role" "client" {
         Action = ["sts:AssumeRole"]
         Effect = "Allow"
         Principal = {
-          Service = "ec2.amazonaws.com"
+          AWS = "arn:aws:iam::${local.account_id}:root"
         }
       }
     ]
   })
   inline_policy {
-    name = "${aws_instance.server.tags.Name}-ssm-ssh-policy"
+    name = "${aws_instance.server.tags.Name}-ssm-session-policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
@@ -142,20 +152,37 @@ resource "aws_iam_role" "client" {
           Effect = "Allow"
           Resource = [
             aws_instance.server.arn,
-            "arn:aws:ssm:${local.region}:${local.account_id}:document/AWS-StartSSHSession"
+            "arn:aws:ssm:${local.region}:${local.account_id}:document/${var.ssm_session_document_name != null ? var.ssm_session_document_name : "AWS-StartSSHSession"}"
           ]
           Condition = {
             BoolIfExists = {
               "ssm:SessionDocumentAccessCheck" = "true"
             }
           }
+        },
+        {
+          Effect   = "Allow"
+          Action   = ["kms:GenerateDataKey"],
+          Resource = var.ssm_session_kms_key_arn != null ? [var.ssm_session_kms_key_arn] : []
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "ssm:GetParameters",
+            "ssm:GetParameter",
+            "ssm:DescribeParameters"
+          ],
+          Resource = concat(
+            [aws_ssm_parameter.server.arn],
+            length(aws_ssm_parameter.ssh) > 0 ? [aws_ssm_parameter.ssh[0].arn] : []
+          )
         }
       ]
     })
   }
   path = "/"
   tags = {
-    Name        = "${aws_instance.server.tags.Name}-ssm-ssh-role"
+    Name        = "${aws_instance.server.tags.Name}-ssm-session-role"
     ProjectName = var.project_name
     EnvType     = var.env_type
   }

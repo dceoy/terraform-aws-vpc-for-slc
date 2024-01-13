@@ -34,23 +34,24 @@ module "vpce" {
   env_type           = var.env_type
 }
 
-module "ec2" {
-  source             = "../../modules/ec2"
-  count              = var.create_ec2_instance && var.private_subnet_count > 0 ? 1 : 0
-  private_subnet_id  = module.subnet.private_subnet_ids[count.index]
-  security_group_ids = [module.subnet.private_security_group_id]
-  project_name       = var.project_name
-  env_type           = var.env_type
-  image_id           = var.image_id
-  instance_type      = var.instance_type
-  ebs_volume_size    = var.ebs_volume_size
-  use_ssh            = var.use_ssh
+module "ssm" {
+  source       = "../../modules/ssm"
+  count        = var.create_ec2_instance && var.private_subnet_count > 0 && !var.use_ssh ? 1 : 0
+  project_name = var.project_name
+  env_type     = var.env_type
 }
 
-module "ssm" {
-  source                = "../../modules/ssm"
-  count                 = length(module.ec2) > 0 && !var.use_ssh ? 1 : 0
-  ec2_instance_role_arn = module.ec2[count.index].ec2_instance_role_arn
-  project_name          = var.project_name
-  env_type              = var.env_type
+module "ec2" {
+  source                         = "../../modules/ec2"
+  count                          = var.create_ec2_instance && var.private_subnet_count > 0 ? 1 : 0
+  private_subnet_id              = module.subnet.private_subnet_ids[count.index]
+  security_group_ids             = [module.subnet.private_security_group_id]
+  ssm_session_document_name      = length(module.ssm) > 0 ? module.ssm[0].ssm_session_document_name : null
+  ssm_session_kms_key_arn        = length(module.ssm) > 0 ? module.ssm[0].ssm_session_kms_key_arn : null
+  ssm_session_log_iam_policy_arn = length(module.ssm) > 0 ? module.ssm[0].ssm_session_log_iam_policy_arn : null
+  project_name                   = var.project_name
+  env_type                       = var.env_type
+  image_id                       = var.image_id
+  instance_type                  = var.instance_type
+  ebs_volume_size                = var.ebs_volume_size
 }
