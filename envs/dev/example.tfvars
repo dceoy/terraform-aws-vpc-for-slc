@@ -1,6 +1,6 @@
 region                         = "ap-northeast-1"
 profile                        = "default"
-project_name                   = "slc"
+system_name                    = "slc"
 env_type                       = "dev"
 vpc_cidr_block                 = "10.0.0.0/16"
 enable_vpc_flow_log            = true

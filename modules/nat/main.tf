@@ -4,9 +4,9 @@ resource "aws_nat_gateway" "nat" {
   subnet_id         = var.public_subnet_ids[count.index]
   connectivity_type = "public"
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-nat-public${count.index}-${local.nat_gateway_azs[count.index]}"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-nat-public${count.index}-${local.nat_gateway_azs[count.index]}"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -14,9 +14,9 @@ resource "aws_eip" "nat" {
   count  = local.nat_gateway_count
   domain = "vpc"
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-eip${count.index}"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-eip${count.index}"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 

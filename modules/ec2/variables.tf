@@ -26,8 +26,8 @@ variable "ssm_session_log_iam_policy_arn" {
   default     = null
 }
 
-variable "project_name" {
-  description = "Set the project name."
+variable "system_name" {
+  description = "System name"
   type        = string
   default     = "slc"
 }
@@ -39,19 +39,19 @@ variable "env_type" {
 }
 
 variable "image_id" {
-  description = "Set an EC2 AMI ID."
+  description = "EC2 AMI ID"
   type        = string
   default     = null
 }
 
 variable "instance_type" {
-  description = "Set an EC2 instance type."
+  description = "EC2 instance type"
   type        = string
   default     = "t4g.small"
 }
 
 variable "ebs_volume_size" {
-  description = "Set EBS volume size."
+  description = "EBS volume size"
   type        = number
   default     = 32
 }

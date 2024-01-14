@@ -6,9 +6,9 @@ resource "aws_vpc_endpoint" "ec2_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ec2"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ec2"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -20,9 +20,9 @@ resource "aws_vpc_endpoint" "ec2_messages_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ec2messages"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ec2messages"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -34,9 +34,9 @@ resource "aws_vpc_endpoint" "ssm_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ssm"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ssm"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -48,9 +48,9 @@ resource "aws_vpc_endpoint" "ssm_messages_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ssmmessages"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ssmmessages"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -62,9 +62,9 @@ resource "aws_vpc_endpoint" "secrets_manager_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-secretsmanager"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-secretsmanager"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -76,9 +76,9 @@ resource "aws_vpc_endpoint" "ecr_dkr_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ecr-dkr"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ecr-dkr"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -90,9 +90,9 @@ resource "aws_vpc_endpoint" "ecr_api_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ecr-api"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ecr-api"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -104,9 +104,9 @@ resource "aws_vpc_endpoint" "ecs_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ecs"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ecs"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -118,9 +118,9 @@ resource "aws_vpc_endpoint" "ecs_agent_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ecs-agent"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ecs-agent"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -132,9 +132,9 @@ resource "aws_vpc_endpoint" "ecs_telemetry_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-ecs-telemetry"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-ecs-telemetry"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -146,8 +146,8 @@ resource "aws_vpc_endpoint" "logs_interface" {
   security_group_ids  = var.security_group_ids
   subnet_ids          = var.private_subnet_ids
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-vpce-if-logs"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-vpce-if-logs"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }

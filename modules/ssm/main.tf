@@ -21,9 +21,9 @@ resource "aws_ssm_document" "session" {
   })
   target_type = "/AWS::SSM::ManagedInstance"
   tags = {
-    Name        = local.ssm_session_document_name
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = local.ssm_session_document_name
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -32,9 +32,9 @@ resource "aws_cloudwatch_log_group" "session" {
   retention_in_days = 14
   kms_key_id        = aws_kms_key.session.arn
   tags = {
-    Name        = "${local.ssm_session_document_name}-log-group"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${local.ssm_session_document_name}-log-group"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -77,9 +77,9 @@ resource "aws_kms_key" "session" {
     ]
   })
   tags = {
-    Name        = "${local.ssm_session_document_name}-log-kms-key"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${local.ssm_session_document_name}-log-kms-key"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -116,8 +116,8 @@ resource "aws_iam_policy" "session" {
   })
   path = "/"
   tags = {
-    Name        = "${aws_ssm_document.session.name}-log-policy"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_ssm_document.session.name}-log-policy"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }

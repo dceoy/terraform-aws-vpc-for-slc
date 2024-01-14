@@ -3,8 +3,8 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "project_name" {
-  description = "Project name"
+variable "system_name" {
+  description = "System name"
   type        = string
   default     = "slc"
 }

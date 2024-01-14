@@ -15,14 +15,14 @@ resource "aws_instance" "server" {
                       EOF
   source_dest_check = true
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ec2-instance"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-ec2-instance"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
 resource "aws_launch_template" "server" {
-  name = "${var.project_name}-${var.env_type}-ec2-launch-template"
+  name = "${var.system_name}-${var.env_type}-ec2-launch-template"
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
@@ -48,9 +48,9 @@ resource "aws_launch_template" "server" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name        = "${var.project_name}-${var.env_type}-ec2-launch-template"
-      ProjectName = var.project_name
-      EnvType     = var.env_type
+      Name       = "${var.system_name}-${var.env_type}-ec2-launch-template"
+      SystemName = var.system_name
+      EnvType    = var.env_type
     }
   }
 }
@@ -60,20 +60,20 @@ resource "aws_network_interface" "server" {
   security_groups   = var.security_group_ids
   source_dest_check = true
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ec2-network-interface"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-ec2-network-interface"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
 resource "aws_iam_instance_profile" "server" {
-  name = "${var.project_name}-${var.env_type}-ec2-instance-profile"
+  name = "${var.system_name}-${var.env_type}-ec2-instance-profile"
   role = aws_iam_role.server.name
   path = "/"
 }
 
 resource "aws_iam_role" "server" {
-  name = "${var.project_name}-${var.env_type}-ec2-instance-role"
+  name = "${var.system_name}-${var.env_type}-ec2-instance-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -92,7 +92,7 @@ resource "aws_iam_role" "server" {
   )
   path = "/"
   tags = {
-    Name    = "${var.project_name}-${var.env_type}-ec2-instance-role"
+    Name    = "${var.system_name}-${var.env_type}-ec2-instance-role"
     EnvType = var.env_type
   }
 }
@@ -105,12 +105,12 @@ resource "tls_private_key" "ssh" {
 
 resource "aws_key_pair" "ssh" {
   count      = length(tls_private_key.ssh) > 0 ? 1 : 0
-  key_name   = "${var.project_name}-${var.env_type}-ec2-key-pair"
+  key_name   = "${var.system_name}-${var.env_type}-ec2-key-pair"
   public_key = tls_private_key.ssh[count.index].public_key_openssh
   tags = {
-    Name        = "${var.project_name}-${var.env_type}-ec2-key-pair"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-ec2-key-pair"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -182,8 +182,8 @@ resource "aws_iam_role" "session" {
   }
   path = "/"
   tags = {
-    Name        = "${aws_instance.server.tags.Name}-ssm-session-role"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_instance.server.tags.Name}-ssm-session-role"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }

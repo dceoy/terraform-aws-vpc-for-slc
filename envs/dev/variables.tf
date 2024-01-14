@@ -10,8 +10,8 @@ variable "profile" {
   default     = "default"
 }
 
-variable "project_name" {
-  description = "Project name"
+variable "system_name" {
+  description = "System name"
   type        = string
   default     = "slc"
 }
@@ -87,25 +87,25 @@ variable "create_ec2_instance" {
 }
 
 variable "image_id" {
-  description = "Set an EC2 AMI ID."
+  description = "EC2 AMI ID"
   type        = string
   default     = null
 }
 
 variable "instance_type" {
-  description = "Set an EC2 instance type."
+  description = "EC2 instance type"
   type        = string
   default     = "t4g.small"
 }
 
 variable "ebs_volume_size" {
-  description = "Set EBS volume size."
+  description = "EBS volume size"
   type        = number
   default     = 32
 }
 
 variable "use_ssh" {
-  description = "Use SSH with a key pair."
+  description = "Use SSH with a key pair"
   type        = bool
   default     = false
 }

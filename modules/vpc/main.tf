@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
     Application = local.vpc_name
     Network     = "Public"
     Name        = local.vpc_name
-    ProjectName = var.project_name
+    SystemName  = var.system_name
     EnvType     = var.env_type
   }
 }
@@ -17,9 +17,9 @@ resource "aws_cloudwatch_log_group" "flow_log" {
   retention_in_days = 14
   kms_key_id        = aws_kms_key.flow_log[count.index].arn
   tags = {
-    Name        = "${aws_vpc.main.tags.Name}-flow-log-group"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_vpc.main.tags.Name}-flow-log-group"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -63,9 +63,9 @@ resource "aws_kms_key" "flow_log" {
     ]
   })
   tags = {
-    Name        = "${aws_vpc.main.tags.Name}-flow-log-kms-key"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_vpc.main.tags.Name}-flow-log-kms-key"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -82,9 +82,9 @@ resource "aws_flow_log" "flow_log" {
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.main.id
   tags = {
-    Name        = "${aws_vpc.main.tags.Name}-flow-log"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_vpc.main.tags.Name}-flow-log"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -132,8 +132,8 @@ resource "aws_iam_role" "flow_log" {
   }
   path = "/"
   tags = {
-    Name        = "${aws_vpc.main.tags.Name}-flow-log-role"
-    ProjectName = var.project_name
-    EnvType     = var.env_type
+    Name       = "${aws_vpc.main.tags.Name}-flow-log-role"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
