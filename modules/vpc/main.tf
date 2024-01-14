@@ -88,7 +88,6 @@ resource "aws_flow_log" "flow_log" {
   }
 }
 
-# tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role" "flow_log" {
   count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
   name  = "${aws_vpc.main.tags.Name}-flow-log-role"
@@ -110,15 +109,23 @@ resource "aws_iam_role" "flow_log" {
       Version = "2012-10-17",
       Statement = [
         {
+          Effect   = "Allow",
+          Action   = ["kms:Decrypt"],
+          Resource = [aws_kms_key.flow_log[count.index].arn]
+        },
+        {
+          Effect   = "Allow",
+          Action   = ["logs:DescribeLogGroups"],
+          Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+        },
+        {
+          Effect = "Allow",
           Action = [
-            # "logs:CreateLogGroup",
             "logs:CreateLogStream",
             "logs:PutLogEvents",
-            "logs:DescribeLogGroups",
             "logs:DescribeLogStreams"
           ],
-          Effect   = "Allow",
-          Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+          Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
         }
       ]
     })

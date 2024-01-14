@@ -88,27 +88,29 @@ resource "aws_kms_alias" "session" {
   target_key_id = aws_kms_key.session.arn
 }
 
-# tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "session" {
   name = "${aws_ssm_document.session.name}-log-policy"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Action   = ["kms:Decrypt"],
         Effect   = "Allow",
+        Action   = ["kms:Decrypt"],
         Resource = [aws_kms_key.session.arn]
       },
       {
+        Effect   = "Allow",
+        Action   = ["logs:DescribeLogGroups"],
+        Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+      },
+      {
+        Effect = "Allow",
         Action = [
-          # "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ],
-        Effect   = "Allow",
-        Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+        Resource = ["${aws_cloudwatch_log_group.session.arn}:*"]
       }
     ]
   })
