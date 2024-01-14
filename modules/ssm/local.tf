@@ -9,5 +9,5 @@ locals {
 }
 
 locals {
-  ssm_session_cloudwatch_log_group_name = "/aws/ssm/session/${local.ssm_session_document_name}"
+  ssm_session_cloudwatch_log_group_name = "${local.ssm_session_document_name}-log-group"
 }

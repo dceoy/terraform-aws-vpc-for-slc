@@ -32,7 +32,7 @@ resource "aws_cloudwatch_log_group" "session" {
   retention_in_days = 14
   kms_key_id        = aws_kms_key.session.arn
   tags = {
-    Name       = "${local.ssm_session_document_name}-log-group"
+    Name       = local.ssm_session_cloudwatch_log_group_name
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -77,7 +77,7 @@ resource "aws_kms_key" "session" {
     ]
   })
   tags = {
-    Name       = "${local.ssm_session_document_name}-log-kms-key"
+    Name       = "${local.ssm_session_cloudwatch_log_group_name}-kms-key"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -89,7 +89,7 @@ resource "aws_kms_alias" "session" {
 }
 
 resource "aws_iam_policy" "session" {
-  name = "${aws_ssm_document.session.name}-log-policy"
+  name = "${aws_cloudwatch_log_group.session.name}-policy"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -116,7 +116,7 @@ resource "aws_iam_policy" "session" {
   })
   path = "/"
   tags = {
-    Name       = "${aws_ssm_document.session.name}-log-policy"
+    Name       = "${aws_cloudwatch_log_group.session.name}-policy"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

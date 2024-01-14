@@ -17,7 +17,7 @@ resource "aws_cloudwatch_log_group" "flow_log" {
   retention_in_days = 14
   kms_key_id        = aws_kms_key.flow_log[count.index].arn
   tags = {
-    Name       = "${aws_vpc.main.tags.Name}-flow-log-group"
+    Name       = local.vpc_flow_log_cloudwatch_log_group_name
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -63,7 +63,7 @@ resource "aws_kms_key" "flow_log" {
     ]
   })
   tags = {
-    Name       = "${aws_vpc.main.tags.Name}-flow-log-kms-key"
+    Name       = "${local.vpc_flow_log_cloudwatch_log_group_name}-kms-key"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -90,7 +90,7 @@ resource "aws_flow_log" "flow_log" {
 
 resource "aws_iam_role" "flow_log" {
   count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  name  = "${aws_vpc.main.tags.Name}-flow-log-role"
+  name  = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -104,7 +104,7 @@ resource "aws_iam_role" "flow_log" {
     ]
   })
   inline_policy {
-    name = "${aws_vpc.main.tags.Name}-flow-log-role-policy"
+    name = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role-policy"
     policy = jsonencode({
       Version = "2012-10-17",
       Statement = [
@@ -132,7 +132,7 @@ resource "aws_iam_role" "flow_log" {
   }
   path = "/"
   tags = {
-    Name       = "${aws_vpc.main.tags.Name}-flow-log-role"
+    Name       = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

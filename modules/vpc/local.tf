@@ -9,5 +9,5 @@ locals {
 }
 
 locals {
-  vpc_flow_log_cloudwatch_log_group_name = "/aws/vpc/flow-logs/${local.vpc_name}"
+  vpc_flow_log_cloudwatch_log_group_name = "${local.vpc_name}-flow-log-group"
 }
