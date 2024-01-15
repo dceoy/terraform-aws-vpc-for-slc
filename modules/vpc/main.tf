@@ -26,7 +26,7 @@ resource "aws_cloudwatch_log_group" "flow_log" {
 resource "aws_kms_key" "flow_log" {
   count                   = var.enable_vpc_flow_log ? 1 : 0
   description             = "KMS key for encrypting CloudWatch Logs"
-  deletion_window_in_days = 14
+  deletion_window_in_days = 30
   enable_key_rotation     = true
   policy = jsonencode({
     Version = "2012-10-17",

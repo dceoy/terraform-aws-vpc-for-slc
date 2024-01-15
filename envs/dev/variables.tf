@@ -86,6 +86,12 @@ variable "create_ec2_instance" {
   default     = true
 }
 
+variable "idle_session_timeout" {
+  description = "Idle session timeout"
+  type        = number
+  default     = 60
+}
+
 variable "image_id" {
   description = "EC2 AMI ID"
   type        = string

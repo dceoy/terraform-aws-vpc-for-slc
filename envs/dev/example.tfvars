@@ -10,6 +10,7 @@ subnet_newbits                 = 8
 create_nat_gateways            = true
 create_vpc_interface_endpoints = true
 create_ec2_instance            = true
+idle_session_timeout           = 60
 image_id                       = "ami-06a2375cfef712d1b"
 instance_type                  = "t4g.small"
 ebs_volume_size                = 32

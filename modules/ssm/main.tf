@@ -11,7 +11,7 @@ resource "aws_ssm_document" "session" {
       cloudWatchEncryptionEnabled = true
       cloudWatchStreamingEnabled  = true
       kmsKeyId                    = aws_kms_key.session.arn
-      idleSessionTimeout          = "20"
+      idleSessionTimeout          = tostring(var.idle_session_timeout)
       runAsEnabled                = true
       runAsDefaultUser            = "ec2-user"
       shellProfile = {
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_log_group" "session" {
 
 resource "aws_kms_key" "session" {
   description             = "KMS key for encrypting CloudWatch Logs"
-  deletion_window_in_days = 14
+  deletion_window_in_days = 30
   enable_key_rotation     = true
   policy = jsonencode({
     Version = "2012-10-17",

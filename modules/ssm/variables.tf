@@ -9,3 +9,9 @@ variable "env_type" {
   type        = string
   default     = "dev"
 }
+
+variable "idle_session_timeout" {
+  description = "Idle session timeout"
+  type        = number
+  default     = 60
+}

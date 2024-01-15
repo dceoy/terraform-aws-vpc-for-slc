@@ -53,6 +53,11 @@ resource "aws_launch_template" "server" {
       EnvType    = var.env_type
     }
   }
+  tags = {
+    Name       = "${var.system_name}-${var.env_type}-ec2-launch-template"
+    SystemName = var.system_name
+    EnvType    = var.env_type
+  }
 }
 
 resource "aws_network_interface" "server" {
@@ -70,6 +75,11 @@ resource "aws_iam_instance_profile" "server" {
   name = "${var.system_name}-${var.env_type}-ec2-instance-profile"
   role = aws_iam_role.server.name
   path = "/"
+  tags = {
+    Name       = "${var.system_name}-${var.env_type}-ec2-instance-profile"
+    SystemName = var.system_name
+    EnvType    = var.env_type
+  }
 }
 
 resource "aws_iam_role" "server" {
@@ -116,15 +126,25 @@ resource "aws_key_pair" "ssh" {
 
 resource "aws_ssm_parameter" "ssh" {
   count = length(tls_private_key.ssh) > 0 ? 1 : 0
-  name  = "/ec2/private-key-pem/${aws_key_pair.ssh[count.index].key_name}"
+  name  = "/${var.system_name}/${var.env_type}/ec2-private-key-pem/${aws_key_pair.ssh[count.index].key_name}"
   type  = "SecureString"
   value = tls_private_key.ssh[count.index].private_key_pem
+  tags = {
+    Name       = "/${var.system_name}/${var.env_type}/ec2-private-key-pem/${aws_key_pair.ssh[count.index].key_name}"
+    SystemName = var.system_name
+    EnvType    = var.env_type
+  }
 }
 
 resource "aws_ssm_parameter" "server" {
-  name  = "/ec2/instance-id/${aws_instance.server.tags.Name}"
+  name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server.tags.Name}"
   type  = "String"
   value = aws_instance.server.id
+  tags = {
+    Name       = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server.tags.Name}"
+    SystemName = var.system_name
+    EnvType    = var.env_type
+  }
 }
 
 resource "aws_iam_role" "session" {
@@ -148,8 +168,8 @@ resource "aws_iam_role" "session" {
       Version = "2012-10-17"
       Statement = [
         {
-          Action = ["ssm:StartSession"]
           Effect = "Allow"
+          Action = ["ssm:StartSession"]
           Resource = [
             aws_instance.server.arn,
             "arn:aws:ssm:${local.region}:${local.account_id}:document/${var.ssm_session_document_name != null ? var.ssm_session_document_name : "AWS-StartSSHSession"}"

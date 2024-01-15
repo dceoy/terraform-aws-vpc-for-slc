@@ -35,10 +35,11 @@ module "vpce" {
 }
 
 module "ssm" {
-  source      = "../../modules/ssm"
-  count       = var.create_ec2_instance && var.private_subnet_count > 0 && !var.use_ssh ? 1 : 0
-  system_name = var.system_name
-  env_type    = var.env_type
+  source               = "../../modules/ssm"
+  count                = var.create_ec2_instance && var.private_subnet_count > 0 && !var.use_ssh ? 1 : 0
+  system_name          = var.system_name
+  env_type             = var.env_type
+  idle_session_timeout = var.idle_session_timeout
 }
 
 module "ec2" {
