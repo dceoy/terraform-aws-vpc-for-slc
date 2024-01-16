@@ -45,5 +45,5 @@ output "ec2_instance_id_ssm_parameter_name" {
 
 output "ec2_ssm_session_iam_role_arn" {
   description = "EC2 SSM session IAM role ARN"
-  value       = length(aws_iam_role.session) > 0 ? aws_iam_role.session[0].arn : null
+  value       = aws_iam_role.session.arn
 }

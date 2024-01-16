@@ -62,22 +62,33 @@ Usage
     ```sh
     $ aws ssm start-session \
         --document-name "$(terraform -chdir='envs/dev/' output -raw ssm_session_document_name)" \
-        --target "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
+        --target "$( \
+          aws ssm get-parameter \
+            --name "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id_ssm_parameter_name)" \
+            --query Parameter.Value \
+            --output text \
+        )"
     ```
 
     Option 2:   Start a session using SSH. (`use_ssh = true`)
 
     ```sh
     $ aws ssm get-parameter \
-        --name "/ec2/private-key-pem/$(terraform -chdir='envs/dev/' output -raw ec2_key_pair_name)" \
+        --name "$(terraform -chdir='envs/dev/' output -raw ec2_private_key_pem_ssm_parameter_name)" \
+        --query Parameter.Value \
+        --output text \
         --with-decryption \
-        | jq -r .Parameter.Value \
         > slc-dev-ec2-key-pair.pem
     $ chmod 600 slc-dev-ec2-key-pair.pem
     $ ssh \
         -o ProxyCommand="aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'" \
         -i slc-dev-ec2-key-pair.pem \
-        "ec2-user@$(terraform -chdir='envs/dev/' output -raw ec2_instance_id)"
+        "ec2-user@$( \
+          aws ssm get-parameter \
+            --name "$(terraform -chdir='envs/dev/' output -raw ec2_instance_id_ssm_parameter_name)" \
+            --query Parameter.Value \
+            --output text \
+        )"
     ```
 
 Cleanup

@@ -29,31 +29,31 @@ resource "aws_kms_key" "flow_log" {
   deletion_window_in_days = 30
   enable_key_rotation     = true
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "Enable IAM User Permissions",
-        Effect = "Allow",
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
         Principal = {
           AWS = "arn:aws:iam::${local.account_id}:root"
-        },
-        Action   = "kms:*",
+        }
+        Action   = "kms:*"
         Resource = "*"
       },
       {
-        Sid    = "Allow CloudWatch to encrypt logs",
-        Effect = "Allow",
+        Sid    = "Allow CloudWatch to encrypt logs"
+        Effect = "Allow"
         Principal = {
           Service = "logs.${local.region}.amazonaws.com"
-        },
+        }
         Action = [
           "kms:Encrypt*",
           "kms:Decrypt*",
           "kms:ReEncrypt*",
           "kms:GenerateDataKey*",
           "kms:Describe*"
-        ],
-        Resource = "*",
+        ]
+        Resource = "*"
         Condition = {
           ArnEquals = {
             "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name}"
@@ -92,11 +92,11 @@ resource "aws_iam_role" "flow_log" {
   count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
   name  = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Action = ["sts:AssumeRole"],
-        Effect = "Allow",
+        Action = ["sts:AssumeRole"]
+        Effect = "Allow"
         Principal = {
           Service = "vpc-flow-logs.amazonaws.com"
         }
@@ -106,25 +106,25 @@ resource "aws_iam_role" "flow_log" {
   inline_policy {
     name = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role-policy"
     policy = jsonencode({
-      Version = "2012-10-17",
+      Version = "2012-10-17"
       Statement = [
         {
-          Effect   = "Allow",
-          Action   = ["kms:Decrypt"],
+          Effect   = "Allow"
+          Action   = ["kms:Decrypt"]
           Resource = [aws_kms_key.flow_log[count.index].arn]
         },
         {
-          Effect   = "Allow",
-          Action   = ["logs:DescribeLogGroups"],
+          Effect   = "Allow"
+          Action   = ["logs:DescribeLogGroups"]
           Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
         },
         {
-          Effect = "Allow",
+          Effect = "Allow"
           Action = [
             "logs:CreateLogStream",
             "logs:PutLogEvents",
             "logs:DescribeLogStreams"
-          ],
+          ]
           Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
         }
       ]
