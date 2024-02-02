@@ -6,6 +6,13 @@ resource "aws_ssm_document" "session" {
     schemaVersion = "1.0"
     description   = "Document to hold regional settings for Session Manager"
     sessionType   = "Standard_Stream"
+    parameters = {
+      linuxShellProfile = {
+        type        = "String"
+        description = "The shell profile to use for Linux instances"
+        default     = "exec bash -l"
+      }
+    }
     inputs = {
       cloudWatchLogGroupName      = aws_cloudwatch_log_group.session.name
       cloudWatchEncryptionEnabled = true
@@ -15,7 +22,7 @@ resource "aws_ssm_document" "session" {
       runAsEnabled                = true
       runAsDefaultUser            = "ec2-user"
       shellProfile = {
-        linux = "cd && exec bash -l"
+        linux = "{{ linuxShellProfile }}"
       }
     }
   })
