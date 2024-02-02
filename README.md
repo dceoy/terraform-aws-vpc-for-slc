@@ -1,9 +1,9 @@
 terraform-aws-vpc-for-slc
 =========================
 
-Terraform module of VPC for serverless computing
+Terraform modules of Amazon VPC for serverless computing
 
-[![Lint](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/lint.yml/badge.svg)](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/lint.yml)
+[![Lint and scan](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/lint-and-scan.yml/badge.svg)](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/lint-and-scan.yml)
 
 Installation
 ------------
