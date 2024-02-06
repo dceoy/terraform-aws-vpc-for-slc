@@ -28,10 +28,10 @@ Installation
 4.  Create configuration files.
 
     ```sh
-    $ cp env/dev/example.tfbackend env/dev/aws.tfbackend
-    $ cp env/dev/example.tfvars env/dev/dev.tfvars
-    $ vi env/dev/aws.tfbackend
-    $ vi env/dev/dev.tfvars
+    $ cp envs/dev/example.tfbackend envs/dev/aws.tfbackend
+    $ vi envs/dev/aws.tfbackend     # => edit
+    $ cp envs/dev/example.tfvars envs/dev/dev.tfvars
+    $ vi envs/dev/dev.tfvars        # => edit
     ```
 
 5.  Initialize a new Terraform working directory.

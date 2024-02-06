@@ -1,4 +1,4 @@
-region                         = "ap-northeast-1"
+region                         = "us-east-1"
 profile                        = "default"
 system_name                    = "slc"
 env_type                       = "dev"
