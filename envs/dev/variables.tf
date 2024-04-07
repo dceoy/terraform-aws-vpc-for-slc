@@ -4,12 +4,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "profile" {
-  description = "AWS profile"
-  type        = string
-  default     = "default"
-}
-
 variable "system_name" {
   description = "System name"
   type        = string

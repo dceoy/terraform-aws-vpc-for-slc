@@ -1,5 +1,4 @@
 region                         = "us-east-1"
-profile                        = "default"
 system_name                    = "slc"
 env_type                       = "dev"
 vpc_cidr_block                 = "10.0.0.0/16"
