@@ -1,1 +1,1 @@
-../vpc/version.tf
+../kms/version.tf

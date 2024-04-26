@@ -1,6 +1,6 @@
 output "ec2_instance_id" {
   description = "EC2 instance ID"
-  value       = aws_instance.server.id
+  value       = length(aws_instance.server) > 0 ? aws_instance.server[0].id : null
 }
 
 output "ec2_launch_template_id" {
@@ -40,7 +40,7 @@ output "ec2_private_key_pem_ssm_parameter_name" {
 
 output "ec2_instance_id_ssm_parameter_name" {
   description = "EC2 instance ID SSM parameter name"
-  value       = aws_ssm_parameter.server.name
+  value       = length(aws_ssm_parameter.server) > 0 ? aws_ssm_parameter.server[0].name : null
 }
 
 output "ec2_ssm_session_iam_role_arn" {

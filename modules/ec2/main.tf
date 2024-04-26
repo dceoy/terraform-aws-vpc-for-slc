@@ -1,4 +1,5 @@
 resource "aws_instance" "server" {
+  count = var.create_ec2_instance ? 1 : 0
   launch_template {
     id      = aws_launch_template.server.id
     version = "$Latest"
@@ -96,10 +97,10 @@ resource "aws_iam_role" "server" {
       }
     ]
   })
-  managed_policy_arns = concat(
-    ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.ssm_session_log_iam_policy_arn != null ? [var.ssm_session_log_iam_policy_arn] : []
-  )
+  managed_policy_arns = compact([
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    var.ssm_session_log_iam_policy_arn
+  ])
   path = "/"
   tags = {
     Name    = "${var.system_name}-${var.env_type}-ec2-instance-role"
@@ -137,18 +138,19 @@ resource "aws_ssm_parameter" "ssh" {
 }
 
 resource "aws_ssm_parameter" "server" {
-  name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server.tags.Name}"
+  count = length(aws_instance.server) > 0 ? 1 : 0
+  name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
   type  = "String"
-  value = aws_instance.server.id
+  value = aws_instance.server[0].id
   tags = {
-    Name       = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server.tags.Name}"
+    Name       = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
 }
 
 resource "aws_iam_role" "session" {
-  name = "${aws_instance.server.tags.Name}-ssm-session-role"
+  name = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -162,7 +164,7 @@ resource "aws_iam_role" "session" {
     ]
   })
   inline_policy {
-    name = "${aws_instance.server.tags.Name}-ssm-session-policy"
+    name = "${var.system_name}-${var.env_type}-ec2-ssm-session-policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = concat(
@@ -206,11 +208,11 @@ resource "aws_iam_role" "session" {
             }
           }
         ],
-        var.ssm_session_kms_key_arn != null ? [
+        var.kms_key_arn != null ? [
           {
             Effect   = "Allow"
             Action   = ["kms:GenerateDataKey"]
-            Resource = [var.ssm_session_kms_key_arn]
+            Resource = [var.kms_key_arn]
           }
         ] : []
       )
@@ -218,7 +220,7 @@ resource "aws_iam_role" "session" {
   }
   path = "/"
   tags = {
-    Name       = "${aws_instance.server.tags.Name}-ssm-session-role"
+    Name       = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

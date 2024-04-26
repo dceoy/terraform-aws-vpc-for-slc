@@ -1,0 +1,28 @@
+include "root" {
+  path = find_in_parent_folders()
+}
+
+dependency "vpc" {
+  config_path = "../vpc"
+  mock_outputs = {
+    vpc_id = "vpc-12345678"
+  }
+}
+
+dependency "subnet" {
+  config_path = "../subnet"
+  mock_outputs = {
+    private_subnet_ids        = ["subnet-12345678", "subnet-87654321"]
+    private_security_group_id = "sg-12345678"
+  }
+}
+
+inputs = {
+  vpc_id             = dependency.vpc.outputs.vpc_id
+  private_subnet_ids = dependency.subnet.outputs.private_subnet_ids
+  security_group_ids = [dependency.subnet.outputs.private_security_group_id]
+}
+
+terraform {
+  source = "${get_repo_root()}/modules/vpce"
+}

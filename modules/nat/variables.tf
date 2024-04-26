@@ -19,3 +19,13 @@ variable "env_type" {
   type        = string
   default     = "dev"
 }
+
+variable "nat_gateway_count" {
+  description = "NAT gateway count"
+  type        = number
+  default     = null
+  validation {
+    condition     = var.nat_gateway_count == null || var.nat_gateway_count >= 0
+    error_message = "NAT gateway count must be greater than or equal to 0"
+  }
+}

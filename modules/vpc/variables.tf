@@ -25,3 +25,19 @@ variable "enable_vpc_flow_log" {
   type        = bool
   default     = true
 }
+
+variable "kms_key_arn" {
+  description = "KMS key ARN"
+  type        = string
+  default     = null
+}
+
+variable "cloudwatch_logs_retention_in_days" {
+  description = "CloudWatch Logs retention in days"
+  type        = number
+  default     = 14
+  validation {
+    condition     = var.cloudwatch_logs_retention_in_days >= 1 && var.cloudwatch_logs_retention_in_days <= 3653
+    error_message = "CloudWatch Logs retention in days must be between 1 and 3653"
+  }
+}

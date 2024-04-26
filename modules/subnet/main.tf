@@ -1,6 +1,6 @@
 resource "aws_subnet" "private" {
   count                   = var.private_subnet_count
-  cidr_block              = cidrsubnet(local.vpc_cidr_block, var.subnet_newbits, count.index)
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index)
   availability_zone       = local.private_subnet_azs[count.index]
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = false
@@ -86,7 +86,7 @@ resource "aws_vpc_endpoint" "dynamodb_gateway" {
 # tfsec:ignore:aws-ec2-no-public-ip-subnet
 resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
-  cidr_block              = cidrsubnet(local.vpc_cidr_block, var.subnet_newbits, count.index + local.az_count)
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + local.az_count)
   availability_zone       = local.public_subnet_azs[count.index]
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = true

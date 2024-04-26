@@ -15,8 +15,6 @@ crash.*.log
 # to change depending on the environment.
 *.tfvars
 *.tfvars.json
-!example.tfvars
-!example.tfvars.json
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
@@ -35,14 +33,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# .terraform.lock.hcl
-.terraform.lock.hcl
-
-# .tfbackend files
-*.tfbackend
-*.tfbackend.json
-!example.tfbackend
-!example.tfbackend.json
+# .terragrunt-cache directory
+.terragrunt-cache
 
 # TLS private key files
 *.pem

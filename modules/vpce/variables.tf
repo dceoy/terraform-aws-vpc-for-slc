@@ -8,6 +8,11 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
+}
+
 variable "system_name" {
   description = "System name"
   type        = string
@@ -18,4 +23,23 @@ variable "env_type" {
   description = "Environment type"
   type        = string
   default     = "dev"
+}
+
+variable "vpc_interface_endpoint_services" {
+  description = "VPC interface endpoint services"
+  type        = list(string)
+  default = [
+    "ec2",
+    "ec2messages",
+    "ssm",
+    "ssmmessages",
+    "secretsmanager",
+    "ecr.dkr",
+    "ecr.api",
+    "ecs",
+    "ecs-agent",
+    "ecs-telemetry",
+    "logs",
+    "kms"
+  ]
 }

@@ -1,0 +1,20 @@
+include "root" {
+  path = find_in_parent_folders()
+}
+
+dependency "vpc" {
+  config_path = "../vpc"
+  mock_outputs = {
+    vpc_id         = "vpc-12345678"
+    vpc_cidr_block = "10.0.0.0/16"
+  }
+}
+
+inputs = {
+  vpc_id         = dependency.vpc.outputs.vpc_id
+  vpc_cidr_block = dependency.vpc.outputs.vpc_cidr_block
+}
+
+terraform {
+  source = "${get_repo_root()}/modules/subnet"
+}
