@@ -17,39 +17,24 @@ Installation
 
 2.  Install [AWS CLI](https://aws.amazon.com/cli/) and set `~/.aws/config` and `~/.aws/credentials`.
 
-3.  Create a S3 bucket and a DynamoDB table for Terraform.
+3.  Install [Terraform](https://www.terraform.io/) and [Terragrunt](https://terragrunt.gruntwork.io/).
+
+4.  Initialize Terraform working directories.
 
     ```sh
-    $ aws cloudformation create-stack \
-        --stack-name s3-and-dynamodb-for-terraform \
-        --template-body file://s3-and-dynamodb-for-terraform.cfn.yml
+    $ terragrunt run-all init --terragrunt-working-dir='envs/dev/' -upgrade -reconfigure
     ```
 
-4.  Create configuration files.
+5.  Generates a speculative execution plan. (Optional)
 
     ```sh
-    $ cp envs/dev/example.tfbackend envs/dev/aws.tfbackend
-    $ vi envs/dev/aws.tfbackend     # => edit
-    $ cp envs/dev/example.tfvars envs/dev/terraform.tfvars
-    $ vi envs/dev/terraform.tfvars  # => edit
+    $ terragrunt run-all plan --terragrunt-working-dir='envs/dev/'
     ```
 
-5.  Initialize a new Terraform working directory.
+6.  Creates or updates infrastructure.
 
     ```sh
-    $ terraform -chdir='envs/dev/' init -reconfigure -backend-config='./aws.tfbackend'
-    ```
-
-6.  Generates a speculative execution plan. (Optional)
-
-    ```sh
-    $ terraform -chdir='envs/dev/' plan
-    ```
-
-7.  Creates or updates infrastructure.
-
-    ```sh
-    $ terraform -chdir='envs/dev/' apply -auto-approve
+    $ terragrunt run-all apply --terragrunt-working-dir='envs/dev/' --terragrunt-non-interactive
     ```
 
 Usage
@@ -95,5 +80,5 @@ Cleanup
 -------
 
 ```sh
-$ terraform -chdir='envs/dev/' apply -var-file='./dev.tfvars' -auto-approve -destroy
+$ terragrunt run-all apply --terragrunt-working-dir='envs/dev/' --terragrunt-non-interactive -destroy
 ```

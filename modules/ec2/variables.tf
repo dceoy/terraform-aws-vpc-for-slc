@@ -8,14 +8,14 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-variable "ssm_session_document_name" {
-  description = "SSM session document name"
+variable "kms_key_arn" {
+  description = "KMS key ARN"
   type        = string
   default     = null
 }
 
-variable "ssm_session_kms_key_arn" {
-  description = "SSM session KMS key ARN"
+variable "ssm_session_document_name" {
+  description = "SSM session document name"
   type        = string
   default     = null
 }

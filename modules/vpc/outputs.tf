@@ -37,8 +37,3 @@ output "vpc_flow_log_iam_role_arn" {
   description = "VPC flow log IAM role ARN"
   value       = length(aws_iam_role.flow_log) > 0 ? aws_iam_role.flow_log[0].arn : null
 }
-
-output "vpc_flow_log_kms_key_arn" {
-  description = "VPC flow log KMS key ARN"
-  value       = length(aws_kms_key.flow_log) > 0 ? aws_kms_key.flow_log[0].arn : null
-}

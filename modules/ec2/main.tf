@@ -206,11 +206,11 @@ resource "aws_iam_role" "session" {
             }
           }
         ],
-        var.ssm_session_kms_key_arn != null ? [
+        var.kms_key_arn != null ? [
           {
             Effect   = "Allow"
             Action   = ["kms:GenerateDataKey"]
-            Resource = [var.ssm_session_kms_key_arn]
+            Resource = [var.kms_key_arn]
           }
         ] : []
       )
