@@ -54,7 +54,7 @@ catalog {
   urls = [
     "${local.repo_root}/modules/kms",
     "${local.repo_root}/modules/vpc",
-    "${local.repo_root}/modules/subnets",
+    "${local.repo_root}/modules/subnet",
     "${local.repo_root}/modules/nat",
     "${local.repo_root}/modules/vpce",
     "${local.repo_root}/modules/ssm",

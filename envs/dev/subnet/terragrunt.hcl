@@ -8,6 +8,7 @@ dependency "vpc" {
     vpc_id         = "vpc-12345678"
     vpc_cidr_block = "10.0.0.0/16"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 inputs = {

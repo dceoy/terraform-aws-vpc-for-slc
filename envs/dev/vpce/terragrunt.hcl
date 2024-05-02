@@ -7,6 +7,7 @@ dependency "vpc" {
   mock_outputs = {
     vpc_id = "vpc-12345678"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 dependency "subnet" {
@@ -15,6 +16,7 @@ dependency "subnet" {
     private_subnet_ids        = ["subnet-12345678", "subnet-87654321"]
     private_security_group_id = "sg-12345678"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 inputs = {

@@ -8,6 +8,7 @@ dependency "subnet" {
     private_subnet_ids        = ["subnet-12345678", "subnet-87654321"]
     private_security_group_id = "sg-12345678"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 dependency "kms" {
@@ -15,6 +16,7 @@ dependency "kms" {
   mock_outputs = {
     kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 dependency "ssm" {
@@ -24,6 +26,7 @@ dependency "ssm" {
     ssm_session_kms_key_arn        = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
     ssm_session_log_iam_policy_arn = "arn:aws:iam::123456789012:policy/ssm-session-log-policy"
   }
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 inputs = {
