@@ -66,6 +66,7 @@ inputs = {
   system_name                       = local.env_vars.locals.system_name
   env_type                          = local.env_vars.locals.env_type
   vpc_cidr_block                    = "10.0.0.0/16"
+  vpc_secondary_cidr_blocks         = []
   enable_vpc_flow_log               = false
   cloudwatch_logs_retention_in_days = 14
   private_subnet_count              = 1

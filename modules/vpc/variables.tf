@@ -11,12 +11,22 @@ variable "env_type" {
 }
 
 variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
+  description = "VPC CIDR block"
   type        = string
   default     = "10.0.0.0/16"
   validation {
     condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}\\/[0-9]{1,2}$", var.vpc_cidr_block))
     error_message = "VPC CIDR block must be a valid CIDR block"
+  }
+}
+
+variable "vpc_secondary_cidr_blocks" {
+  description = "VPC secondary CIDR blocks"
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for c in var.vpc_secondary_cidr_blocks : can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}\\/[0-9]{1,2}$", c))])
+    error_message = "Secondary CIDR blocks must be a valid CIDR block"
   }
 }
 

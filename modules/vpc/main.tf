@@ -11,6 +11,12 @@ resource "aws_vpc" "main" {
   }
 }
 
+resource "aws_vpc_ipv4_cidr_block_association" "main" {
+  for_each   = toset(var.vpc_secondary_cidr_blocks)
+  vpc_id     = aws_vpc.main.id
+  cidr_block = each.key
+}
+
 resource "aws_cloudwatch_log_group" "flow_log" {
   count             = var.enable_vpc_flow_log ? 1 : 0
   name              = local.vpc_flow_log_cloudwatch_log_group_name
