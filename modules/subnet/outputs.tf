@@ -48,9 +48,9 @@ output "public_subnet_ids" {
   value       = aws_subnet.public[*].id
 }
 
-output "public_route_table_ids" {
-  description = "Public route table IDs"
-  value       = aws_route_table.public[*].id
+output "public_route_table_id" {
+  description = "Public route table ID"
+  value       = length(aws_route_table.public) > 0 ? aws_route_table.public[0].id : null
 }
 
 output "internet_gateway_id" {

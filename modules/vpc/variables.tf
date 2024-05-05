@@ -26,7 +26,7 @@ variable "vpc_secondary_cidr_blocks" {
   default     = []
   validation {
     condition     = alltrue([for c in var.vpc_secondary_cidr_blocks : can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}\\/[0-9]{1,2}$", c))])
-    error_message = "Secondary CIDR blocks must be a valid CIDR block"
+    error_message = "VPC secondary CIDR blocks must be valid CIDR blocks"
   }
 }
 

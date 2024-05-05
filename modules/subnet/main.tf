@@ -117,7 +117,7 @@ resource "aws_internet_gateway" "public" {
   count  = length(aws_subnet.public) > 0 ? 1 : 0
   vpc_id = var.vpc_id
   tags = {
-    Application = "${var.system_name}-${var.env_type}-vpc"
+    Application = "${var.system_name}-${var.env_type}-igw"
     Network     = "Public"
     Name        = "${var.system_name}-${var.env_type}-igw"
     SystemName  = var.system_name
