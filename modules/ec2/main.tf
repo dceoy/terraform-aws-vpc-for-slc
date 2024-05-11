@@ -167,55 +167,51 @@ resource "aws_iam_role" "session" {
     name = "${var.system_name}-${var.env_type}-ec2-ssm-session-policy"
     policy = jsonencode({
       Version = "2012-10-17"
-      Statement = concat(
-        [
-          {
-            Effect   = "Allow"
-            Action   = ["ssm:StartSession"]
-            Resource = ["arn:aws:ec2:*:*:instance/*"]
-            Condition = {
-              StringEquals = {
-                "aws:ResourceTag/SystemName" = var.system_name
-                "aws:ResourceTag/EnvType"    = var.env_type
-              }
-            }
-          },
-          {
-            Effect = "Allow"
-            Action = ["ssm:StartSession"]
-            Resource = [
-              "arn:aws:ssm:${local.region}:${local.account_id}:document/${var.ssm_session_document_name != null ? var.ssm_session_document_name : "AWS-StartSSHSession"}"
-            ]
-            Condition = {
-              BoolIfExists = {
-                "ssm:SessionDocumentAccessCheck" = "true"
-              }
-            }
-          },
-          {
-            Effect = "Allow"
-            Action = [
-              "ssm:GetParameters",
-              "ssm:GetParameter",
-              "ssm:DescribeParameters"
-            ]
-            Resource = ["arn:aws:ssm:*:*:parameter/*"]
-            Condition = {
-              StringEquals = {
-                "aws:ResourceTag/SystemName" = var.system_name
-                "aws:ResourceTag/EnvType"    = var.env_type
-              }
+      Statement = [
+        {
+          Effect   = "Allow"
+          Action   = ["ssm:StartSession"]
+          Resource = ["arn:aws:ec2:*:*:instance/*"]
+          Condition = {
+            StringEquals = {
+              "aws:ResourceTag/SystemName" = var.system_name
+              "aws:ResourceTag/EnvType"    = var.env_type
             }
           }
-        ],
-        var.kms_key_arn != null ? [
-          {
-            Effect   = "Allow"
-            Action   = ["kms:GenerateDataKey"]
-            Resource = [var.kms_key_arn]
+        },
+        {
+          Effect = "Allow"
+          Action = ["ssm:StartSession"]
+          Resource = [
+            "arn:aws:ssm:${local.region}:${local.account_id}:document/${var.ssm_session_document_name != null ? var.ssm_session_document_name : "AWS-StartSSHSession"}"
+          ]
+          Condition = {
+            BoolIfExists = {
+              "ssm:SessionDocumentAccessCheck" = "true"
+            }
           }
-        ] : []
-      )
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "ssm:GetParameters",
+            "ssm:GetParameter",
+            "ssm:DescribeParameters"
+          ]
+          Resource = ["arn:aws:ssm:*:*:parameter/*"]
+          Condition = {
+            StringEquals = {
+              "aws:ResourceTag/SystemName" = var.system_name
+              "aws:ResourceTag/EnvType"    = var.env_type
+            }
+          }
+        },
+        {
+          Effect   = "Allow"
+          Action   = ["kms:GenerateDataKey"]
+          Resource = compact([var.kms_key_arn])
+        }
+      ]
     })
   }
   path = "/"

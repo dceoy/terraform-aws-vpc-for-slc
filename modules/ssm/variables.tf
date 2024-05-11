@@ -25,9 +25,9 @@ variable "kms_key_arn" {
 variable "cloudwatch_logs_retention_in_days" {
   description = "CloudWatch Logs retention in days"
   type        = number
-  default     = 14
+  default     = 30
   validation {
-    condition     = var.cloudwatch_logs_retention_in_days >= 1 && var.cloudwatch_logs_retention_in_days <= 3653
-    error_message = "CloudWatch Logs retention in days must be between 1 and 3653"
+    condition     = var.cloudwatch_logs_retention_in_days == null ? true : contains([0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653], var.cloudwatch_logs_retention_in_days)
+    error_message = "Must be 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 or 0 (zero indicates never expire logs)."
   }
 }

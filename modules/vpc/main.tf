@@ -44,7 +44,7 @@ resource "aws_flow_log" "flow_log" {
 
 resource "aws_iam_role" "flow_log" {
   count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  name  = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role"
+  name  = "${aws_vpc.main.tags.Name}-flow-log-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -58,15 +58,10 @@ resource "aws_iam_role" "flow_log" {
     ]
   })
   inline_policy {
-    name = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role-policy"
+    name = "${aws_vpc.main.tags.Name}-flow-log-role-policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
-        {
-          Effect   = "Allow"
-          Action   = ["kms:Decrypt"]
-          Resource = compact([var.kms_key_arn])
-        },
         {
           Effect   = "Allow"
           Action   = ["logs:DescribeLogGroups"]
@@ -80,13 +75,18 @@ resource "aws_iam_role" "flow_log" {
             "logs:DescribeLogStreams"
           ]
           Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
+        },
+        {
+          Effect   = "Allow"
+          Action   = ["kms:Decrypt"]
+          Resource = compact([var.kms_key_arn])
         }
       ]
     })
   }
   path = "/"
   tags = {
-    Name       = "${aws_cloudwatch_log_group.flow_log[count.index].name}-role"
+    Name       = "${aws_vpc.main.tags.Name}-flow-log-role"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

@@ -46,15 +46,10 @@ resource "aws_cloudwatch_log_group" "session" {
 }
 
 resource "aws_iam_policy" "session" {
-  name = "${aws_cloudwatch_log_group.session.name}-policy"
+  name = "${aws_ssm_document.session.name}-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["kms:Decrypt"]
-        Resource = compact([var.kms_key_arn])
-      },
       {
         Effect   = "Allow"
         Action   = ["logs:DescribeLogGroups"]
@@ -68,12 +63,17 @@ resource "aws_iam_policy" "session" {
           "logs:DescribeLogStreams"
         ]
         Resource = ["${aws_cloudwatch_log_group.session.arn}:*"]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["kms:Decrypt"]
+        Resource = compact([var.kms_key_arn])
       }
     ]
   })
   path = "/"
   tags = {
-    Name       = "${aws_cloudwatch_log_group.session.name}-policy"
+    Name       = "${aws_ssm_document.session.name}-policy"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

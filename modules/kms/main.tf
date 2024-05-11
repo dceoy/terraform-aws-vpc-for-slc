@@ -1,6 +1,7 @@
 resource "aws_kms_key" "custom" {
+  count                   = var.create_kms_key ? 1 : 0
   description             = "KMS key for CloudWatch Logs"
-  deletion_window_in_days = 30
+  deletion_window_in_days = var.kms_key_deletion_window_in_days
   enable_key_rotation     = true
   policy = jsonencode({
     Version = "2012-10-17"
@@ -44,6 +45,7 @@ resource "aws_kms_key" "custom" {
 }
 
 resource "aws_kms_alias" "custom" {
-  name          = "alias/${aws_kms_key.custom.tags.Name}"
-  target_key_id = aws_kms_key.custom.arn
+  count         = length(aws_kms_key.custom) > 0 ? 1 : 0
+  name          = "alias/${aws_kms_key.custom[count.index].tags.Name}"
+  target_key_id = aws_kms_key.custom[count.index].arn
 }

@@ -59,9 +59,11 @@ catalog {
 inputs = {
   system_name                       = local.env_vars.locals.system_name
   env_type                          = local.env_vars.locals.env_type
+  create_kms_key                    = true
+  kms_key_deletion_window_in_days   = 30
   vpc_cidr_block                    = "10.0.0.0/16"
   vpc_secondary_cidr_blocks         = []
-  enable_vpc_flow_log               = false
+  enable_vpc_flow_log               = true
   cloudwatch_logs_retention_in_days = 14
   private_subnet_count              = 1
   public_subnet_count               = 1
