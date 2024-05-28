@@ -61,27 +61,33 @@ resource "aws_iam_role" "flow_log" {
     name = "${aws_vpc.main.tags.Name}-flow-log-role-policy"
     policy = jsonencode({
       Version = "2012-10-17"
-      Statement = [
-        {
-          Effect   = "Allow"
-          Action   = ["logs:DescribeLogGroups"]
-          Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
-        },
-        {
-          Effect = "Allow"
-          Action = [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:DescribeLogStreams"
-          ]
-          Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["kms:Decrypt"]
-          Resource = compact([var.kms_key_arn])
-        }
-      ]
+      Statement = concat(
+        [
+          {
+            Effect   = "Allow"
+            Action   = ["logs:DescribeLogGroups"]
+            Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
+          },
+          {
+            Effect = "Allow"
+            Action = [
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "logs:DescribeLogStreams"
+            ]
+            Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
+          }
+        ],
+        (
+          var.kms_key_arn != null ? [
+            {
+              Effect   = "Allow"
+              Action   = ["kms:GenerateDataKey"]
+              Resource = [var.kms_key_arn]
+            }
+          ] : []
+        )
+      )
     })
   }
   path = "/"
