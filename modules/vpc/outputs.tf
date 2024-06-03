@@ -25,15 +25,10 @@ output "vpc_cidr_block" {
 
 output "vpc_flow_log_id" {
   description = "VPC flow log"
-  value       = length(aws_flow_log.flow_log) > 0 ? aws_flow_log.flow_log[0].id : null
-}
-
-output "vpc_flow_log_cloudwatch_log_group_name" {
-  description = "VPC flow log CloudWatch log group name"
-  value       = length(aws_cloudwatch_log_group.flow_log) > 0 ? aws_cloudwatch_log_group.flow_log[0].name : null
+  value       = length(aws_flow_log.log) > 0 ? aws_flow_log.log[0].id : null
 }
 
 output "vpc_flow_log_iam_role_arn" {
   description = "VPC flow log IAM role ARN"
-  value       = length(aws_iam_role.flow_log) > 0 ? aws_iam_role.flow_log[0].arn : null
+  value       = length(aws_iam_role.log) > 0 ? aws_iam_role.log[0].arn : null
 }

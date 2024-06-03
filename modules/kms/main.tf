@@ -1,6 +1,6 @@
 resource "aws_kms_key" "custom" {
   count                   = var.create_kms_key ? 1 : 0
-  description             = "KMS key for CloudWatch Logs"
+  description             = "KMS key for S3"
   deletion_window_in_days = var.kms_key_deletion_window_in_days
   enable_key_rotation     = true
   policy = jsonencode({
@@ -16,22 +16,22 @@ resource "aws_kms_key" "custom" {
         Resource = "*"
       },
       {
-        Sid    = "AllowCloudWatchLogsToEncrypt"
+        Sid    = "S3EncryptS3AccessLogs"
         Effect = "Allow"
         Principal = {
-          Service = "logs.${local.region}.amazonaws.com"
+          Service = "s3.amazonaws.com"
         }
         Action = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
         ]
         Resource = "*"
         Condition = {
-          ArnLike = {
-            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:*"
+          StringEquals = {
+            "kms:CallerAccount" = local.account_id
+          }
+          StringLike = {
+            "kms:ViaService" = "s3.*.amazonaws.com"
           }
         }
       }

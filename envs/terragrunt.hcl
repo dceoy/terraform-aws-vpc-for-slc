@@ -47,6 +47,7 @@ EOF
 catalog {
   urls = [
     "${local.repo_root}/modules/kms",
+    "${local.repo_root}/modules/s3",
     "${local.repo_root}/modules/vpc",
     "${local.repo_root}/modules/subnet",
     "${local.repo_root}/modules/nat",
@@ -57,26 +58,30 @@ catalog {
 }
 
 inputs = {
-  system_name                       = local.env_vars.locals.system_name
-  env_type                          = local.env_vars.locals.env_type
-  create_kms_key                    = true
-  kms_key_deletion_window_in_days   = 30
-  vpc_cidr_block                    = "10.0.0.0/16"
-  vpc_secondary_cidr_blocks         = []
-  enable_vpc_flow_log               = true
-  cloudwatch_logs_retention_in_days = 30
-  private_subnet_count              = 1
-  public_subnet_count               = 1
-  subnet_newbits                    = 8
-  nat_gateway_count                 = 0
+  system_name                               = local.env_vars.locals.system_name
+  env_type                                  = local.env_vars.locals.env_type
+  create_kms_key                            = true
+  kms_key_deletion_window_in_days           = 30
+  create_log_s3_bucket                      = true
+  s3_force_destroy                          = true
+  s3_noncurrent_version_expiration_days     = 7
+  s3_abort_incomplete_multipart_upload_days = 7
+  vpc_cidr_block                            = "10.0.0.0/16"
+  vpc_secondary_cidr_blocks                 = []
+  cloudwatch_logs_retention_in_days         = 30
+  private_subnet_count                      = 1
+  public_subnet_count                       = 1
+  subnet_newbits                            = 8
+  nat_gateway_count                         = 0
   vpc_interface_endpoint_services = [
-    "ec2", "ec2messages", "ssm", "ssmmessages", "secretsmanager", "logs", "kms",
-    # "ecr.dkr", "ecr.api", "ecs", "ecs-agent", "ecs-telemetry"
+    "ec2", "ec2messages", "ssm", "ssmmessages", "kms",
+    # "logs", "secretsmanager", "ecr.dkr", "ecr.api", "ecs", "ecs-agent", "ecs-telemetry"
   ]
-  create_ec2_instance  = true
-  idle_session_timeout = 60
-  instance_type        = "t4g.small"
-  ebs_volume_size      = 32
-  use_ssh              = false
-  # image_id             = null
+  create_ssm_session_document      = true
+  ssm_session_idle_session_timeout = 60
+  create_ec2_instance              = true
+  ec2_instance_type                = "t4g.small"
+  ec2_ebs_volume_size              = 32
+  # s3_expiration_days   = null
+  # ec2_image_id             = null
 }

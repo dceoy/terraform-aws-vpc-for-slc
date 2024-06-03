@@ -2,6 +2,14 @@ include "root" {
   path = find_in_parent_folders()
 }
 
+dependency "s3" {
+  config_path = "../s3"
+  mock_outputs = {
+    log_s3_bucket_id = "log-s3-bucket"
+  }
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
 dependency "kms" {
   config_path = "../kms"
   mock_outputs = {
@@ -11,7 +19,8 @@ dependency "kms" {
 }
 
 inputs = {
-  kms_key_arn = dependency.kms.outputs.kms_key_arn
+  ssm_session_log_s3_bucket_id = dependency.s3.outputs.log_s3_bucket_id
+  kms_key_arn                  = dependency.kms.outputs.kms_key_arn
 }
 
 terraform {

@@ -10,10 +10,10 @@ resource "aws_instance" "server" {
   metadata_options {
     http_tokens = "required"
   }
-  user_data         = <<-EOF
+  user_data         = <<-EOT
                       #!/usr/bin/env bash
                       sudo sh -c 'dnf -y upgrade && dnf clean all && rm -rf /var/cache/dnf'
-                      EOF
+                      EOT
   source_dest_check = true
   tags = {
     Name       = "${var.system_name}-${var.env_type}-ec2-instance"
@@ -27,14 +27,14 @@ resource "aws_launch_template" "server" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size           = var.ebs_volume_size
+      volume_size           = var.ec2_ebs_volume_size
       volume_type           = "gp3"
       encrypted             = true
       delete_on_termination = true
     }
   }
-  image_id      = local.image_id
-  instance_type = var.instance_type
+  image_id      = local.ec2_image_id
+  instance_type = var.ec2_instance_type
   key_name      = length(aws_key_pair.ssh) > 0 ? aws_key_pair.ssh[0].key_name : null
   network_interfaces {
     network_interface_id = aws_network_interface.server.id
@@ -84,7 +84,9 @@ resource "aws_iam_instance_profile" "server" {
 }
 
 resource "aws_iam_role" "server" {
-  name = "${var.system_name}-${var.env_type}-ec2-instance-role"
+  name        = "${var.system_name}-${var.env_type}-ec2-instance-role"
+  description = "EC2 instance IAM role"
+  path        = "/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -101,15 +103,26 @@ resource "aws_iam_role" "server" {
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     var.ssm_session_log_iam_policy_arn
   ])
-  path = "/"
   tags = {
     Name    = "${var.system_name}-${var.env_type}-ec2-instance-role"
     EnvType = var.env_type
   }
 }
 
+resource "aws_ssm_parameter" "server" {
+  count = length(aws_instance.server) > 0 ? 1 : 0
+  name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
+  type  = "String"
+  value = aws_instance.server[0].id
+  tags = {
+    Name       = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
+    SystemName = var.system_name
+    EnvType    = var.env_type
+  }
+}
+
 resource "tls_private_key" "ssh" {
-  count     = var.ssm_session_document_name == null ? 1 : 0
+  count     = var.ssm_session_document_iam_policy_arn == null ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
@@ -137,20 +150,10 @@ resource "aws_ssm_parameter" "ssh" {
   }
 }
 
-resource "aws_ssm_parameter" "server" {
-  count = length(aws_instance.server) > 0 ? 1 : 0
-  name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
-  type  = "String"
-  value = aws_instance.server[0].id
-  tags = {
-    Name       = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
-    SystemName = var.system_name
-    EnvType    = var.env_type
-  }
-}
-
 resource "aws_iam_role" "session" {
-  name = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
+  name        = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
+  description = "EC2 SSM session IAM role"
+  path        = "/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -163,6 +166,7 @@ resource "aws_iam_role" "session" {
       }
     ]
   })
+  managed_policy_arns = compact([var.ssm_session_document_iam_policy_arn])
   inline_policy {
     name = "${var.system_name}-${var.env_type}-ec2-ssm-session-policy"
     policy = jsonencode({
@@ -177,18 +181,6 @@ resource "aws_iam_role" "session" {
               StringEquals = {
                 "aws:ResourceTag/SystemName" = var.system_name
                 "aws:ResourceTag/EnvType"    = var.env_type
-              }
-            }
-          },
-          {
-            Effect = "Allow"
-            Action = ["ssm:StartSession"]
-            Resource = [
-              "arn:aws:ssm:${local.region}:${local.account_id}:document/${var.ssm_session_document_name != null ? var.ssm_session_document_name : "AWS-StartSSHSession"}"
-            ]
-            Condition = {
-              BoolIfExists = {
-                "ssm:SessionDocumentAccessCheck" = "true"
               }
             }
           },
@@ -209,18 +201,24 @@ resource "aws_iam_role" "session" {
           }
         ],
         (
-          var.kms_key_arn != null ? [
+          var.ssm_session_document_iam_policy_arn == null ? [
             {
-              Effect   = "Allow"
-              Action   = ["kms:GenerateDataKey"]
-              Resource = compact([var.kms_key_arn])
+              Effect = "Allow"
+              Action = ["ssm:StartSession"]
+              Resource = [
+                "arn:aws:ssm:${local.region}:${local.account_id}:document/AWS-StartSSHSession"
+              ]
+              Condition = {
+                BoolIfExists = {
+                  "ssm:SessionDocumentAccessCheck" = "true"
+                }
+              }
             }
           ] : []
         )
       )
     })
   }
-  path = "/"
   tags = {
     Name       = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
     SystemName = var.system_name

@@ -1,14 +1,9 @@
 output "ssm_session_document_name" {
   description = "SSM session document name"
-  value       = aws_ssm_document.session.name
+  value       = length(aws_ssm_document.session) > 0 ? local.ssm_session_document_name : null
 }
 
-output "ssm_session_cloudwatch_log_group_name" {
-  description = "SSM session CloudWatch log group name"
-  value       = aws_cloudwatch_log_group.session.name
-}
-
-output "ssm_session_log_iam_policy_arn" {
-  description = "SSM session IAM policy ARN"
-  value       = aws_iam_policy.session.arn
+output "ssm_session_document_iam_policy_arn" {
+  description = "SSM session document IAM policy ARN"
+  value       = length(aws_iam_policy.session) > 0 ? aws_iam_policy.session[0].arn : null
 }

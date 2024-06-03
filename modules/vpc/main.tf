@@ -1,3 +1,4 @@
+# tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
@@ -17,24 +18,13 @@ resource "aws_vpc_ipv4_cidr_block_association" "main" {
   cidr_block = each.key
 }
 
-resource "aws_cloudwatch_log_group" "flow_log" {
-  count             = var.enable_vpc_flow_log ? 1 : 0
-  name              = local.vpc_flow_log_cloudwatch_log_group_name
-  retention_in_days = var.cloudwatch_logs_retention_in_days
-  kms_key_id        = var.kms_key_arn
-  tags = {
-    Name       = local.vpc_flow_log_cloudwatch_log_group_name
-    SystemName = var.system_name
-    EnvType    = var.env_type
-  }
-}
-
-resource "aws_flow_log" "flow_log" {
-  count           = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
-  iam_role_arn    = aws_iam_role.flow_log[count.index].arn
-  log_destination = aws_cloudwatch_log_group.flow_log[count.index].arn
-  traffic_type    = "ALL"
-  vpc_id          = aws_vpc.main.id
+resource "aws_flow_log" "log" {
+  count                = length(aws_iam_role.log) > 0 ? 1 : 0
+  vpc_id               = aws_vpc.main.id
+  log_destination_type = "s3"
+  log_destination      = "arn:aws:s3:::${var.vpc_flow_log_s3_bucket_id}/${var.system_name}/${var.env_type}/vpc/${aws_vpc.main.tags.Name}"
+  iam_role_arn         = aws_iam_role.log[count.index].arn
+  traffic_type         = "ALL"
   tags = {
     Name       = "${aws_vpc.main.tags.Name}-flow-log"
     SystemName = var.system_name
@@ -42,8 +32,8 @@ resource "aws_flow_log" "flow_log" {
   }
 }
 
-resource "aws_iam_role" "flow_log" {
-  count = length(aws_cloudwatch_log_group.flow_log) > 0 ? 1 : 0
+resource "aws_iam_role" "log" {
+  count = var.vpc_flow_log_s3_bucket_id != null && var.vpc_flow_log_s3_iam_policy_arn != null ? 1 : 0
   name  = "${aws_vpc.main.tags.Name}-flow-log-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -57,40 +47,8 @@ resource "aws_iam_role" "flow_log" {
       }
     ]
   })
-  inline_policy {
-    name = "${aws_vpc.main.tags.Name}-flow-log-role-policy"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = concat(
-        [
-          {
-            Effect   = "Allow"
-            Action   = ["logs:DescribeLogGroups"]
-            Resource = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
-          },
-          {
-            Effect = "Allow"
-            Action = [
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams"
-            ]
-            Resource = ["${aws_cloudwatch_log_group.flow_log[count.index].arn}:*"]
-          }
-        ],
-        (
-          var.kms_key_arn != null ? [
-            {
-              Effect   = "Allow"
-              Action   = ["kms:GenerateDataKey"]
-              Resource = [var.kms_key_arn]
-            }
-          ] : []
-        )
-      )
-    })
-  }
-  path = "/"
+  managed_policy_arns = [var.vpc_flow_log_s3_iam_policy_arn]
+  path                = "/"
   tags = {
     Name       = "${aws_vpc.main.tags.Name}-flow-log-role"
     SystemName = var.system_name

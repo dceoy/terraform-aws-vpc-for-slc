@@ -11,10 +11,10 @@ dependency "subnet" {
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
-dependency "kms" {
-  config_path = "../kms"
+dependency "s3" {
+  config_path = "../s3"
   mock_outputs = {
-    kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+    log_s3_iam_policy_arn = "arn:aws:iam::123456789012:policy/log-s3-iam-policy"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
@@ -22,19 +22,16 @@ dependency "kms" {
 dependency "ssm" {
   config_path = "../ssm"
   mock_outputs = {
-    ssm_session_document_name      = "ssm-session-document"
-    ssm_session_kms_key_arn        = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
-    ssm_session_log_iam_policy_arn = "arn:aws:iam::123456789012:policy/ssm-session-log-policy"
+    ssm_session_document_iam_policy_arn = "arn:aws:iam::123456789012:policy/ssm-session-document-iam-policy"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 inputs = {
-  private_subnet_id              = dependency.subnet.outputs.private_subnet_ids[0]
-  security_group_ids             = [dependency.subnet.outputs.private_security_group_id]
-  kms_key_arn                    = dependency.kms.outputs.kms_key_arn
-  ssm_session_document_name      = dependency.ssm.outputs.ssm_session_document_name
-  ssm_session_log_iam_policy_arn = dependency.ssm.outputs.ssm_session_log_iam_policy_arn
+  private_subnet_id                   = dependency.subnet.outputs.private_subnet_ids[0]
+  security_group_ids                  = [dependency.subnet.outputs.private_security_group_id]
+  ssm_session_log_iam_policy_arn      = dependency.s3.outputs.log_s3_iam_policy_arn
+  ssm_session_document_iam_policy_arn = dependency.ssm.outputs.ssm_session_document_iam_policy_arn
 }
 
 terraform {

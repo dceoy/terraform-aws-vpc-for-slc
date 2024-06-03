@@ -28,6 +28,11 @@ output "ec2_instance_profile_arn" {
   value       = aws_iam_instance_profile.server.arn
 }
 
+output "ec2_instance_id_ssm_parameter_name" {
+  description = "EC2 instance ID SSM parameter name"
+  value       = length(aws_ssm_parameter.server) > 0 ? aws_ssm_parameter.server[0].name : null
+}
+
 output "ec2_key_pair_name" {
   description = "EC2 key pair name"
   value       = length(aws_key_pair.ssh) > 0 ? aws_key_pair.ssh[0].key_name : null
@@ -36,11 +41,6 @@ output "ec2_key_pair_name" {
 output "ec2_private_key_pem_ssm_parameter_name" {
   description = "EC2 private key PEM SSM parameter name"
   value       = length(aws_ssm_parameter.ssh) > 0 ? aws_ssm_parameter.ssh[0].name : null
-}
-
-output "ec2_instance_id_ssm_parameter_name" {
-  description = "EC2 instance ID SSM parameter name"
-  value       = length(aws_ssm_parameter.server) > 0 ? aws_ssm_parameter.server[0].name : null
 }
 
 output "ec2_ssm_session_iam_role_arn" {
