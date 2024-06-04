@@ -69,19 +69,40 @@ resource "aws_s3_bucket_policy" "log" {
     Id      = "${aws_s3_bucket.log[count.index].id}-policy"
     Statement = [
       {
-        Sid    = "S3PutS3ServerAccessLogs"
+        Sid    = "DeliverLogsGetS3BucketAclAndListS3Bucket"
         Effect = "Allow"
         Principal = {
-          Service = "logging.s3.amazonaws.com"
+          Service = "delivery.logs.amazonaws.com"
         }
-        Action   = ["s3:PutObject"]
-        Resource = "${aws_s3_bucket.log[count.index].arn}/*"
+        Action = [
+          "s3:GetBucketAcl",
+          "s3:ListBucket"
+        ]
+        Resource = [aws_s3_bucket.log[count.index].arn]
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = local.account_id
           }
           ArnLike = {
-            "aws:SourceArn" = "arn:aws:s3:::${var.system_name}-${var.env_type}-*"
+            "aws:SourceArn" = "arn:aws:logs:${local.region}:${local.account_id}:*"
+          }
+        }
+      },
+      {
+        Sid    = "DeliverLogsPutS3Buckets"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = ["s3:PutObject"]
+        Resource = ["${aws_s3_bucket.log[count.index].arn}/*"]
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+            "aws:SourceAccount" = local.account_id
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:logs:${local.region}:${local.account_id}:*"
           }
         }
       }

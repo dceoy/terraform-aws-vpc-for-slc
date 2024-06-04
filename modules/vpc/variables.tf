@@ -36,10 +36,10 @@ variable "vpc_flow_log_s3_bucket_id" {
   default     = null
 }
 
-variable "vpc_flow_log_s3_iam_policy_arn" {
-  description = "VPC flow log S3 IAM policy ARN"
+variable "vpc_s3_key_prefix" {
+  description = "VPC S3 key prefix"
   type        = string
-  default     = null
+  default     = "vpc"
 }
 
 variable "kms_key_arn" {

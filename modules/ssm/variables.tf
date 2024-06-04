@@ -28,6 +28,12 @@ variable "ssm_session_log_s3_bucket_id" {
   default     = null
 }
 
+variable "ssm_s3_key_prefix" {
+  description = "SSM S3 key prefix"
+  type        = string
+  default     = "ssm"
+}
+
 variable "kms_key_arn" {
   description = "KMS key ARN"
   type        = string

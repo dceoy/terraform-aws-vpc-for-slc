@@ -26,14 +26,14 @@ variable "create_ec2_instance" {
   default     = true
 }
 
-variable "ssm_session_document_iam_policy_arn" {
-  description = "SSM session document IAM policy ARN"
+variable "ssm_session_server_iam_policy_arn" {
+  description = "SSM session server IAM policy ARN"
   type        = string
   default     = null
 }
 
-variable "ssm_session_log_iam_policy_arn" {
-  description = "SSM session log IAM policy ARN"
+variable "ssm_session_client_iam_policy_arn" {
+  description = "SSM session client IAM policy ARN"
   type        = string
   default     = null
 }

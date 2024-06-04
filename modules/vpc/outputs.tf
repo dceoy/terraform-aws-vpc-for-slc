@@ -27,8 +27,3 @@ output "vpc_flow_log_id" {
   description = "VPC flow log"
   value       = length(aws_flow_log.log) > 0 ? aws_flow_log.log[0].id : null
 }
-
-output "vpc_flow_log_iam_role_arn" {
-  description = "VPC flow log IAM role ARN"
-  value       = length(aws_iam_role.log) > 0 ? aws_iam_role.log[0].arn : null
-}
