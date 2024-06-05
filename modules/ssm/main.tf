@@ -7,13 +7,22 @@ resource "aws_ssm_document" "session" {
   content = jsonencode({
     schemaVersion = "1.0"
     description   = "Document to hold regional settings for Session Manager"
-    sessionType   = "Standard_Stream"
+    sessionType   = "Port"
     parameters = {
       linuxShellProfile = {
         type        = "String"
         description = "The shell profile to use for Linux instances"
         default     = "exec bash -l"
       }
+      portNumber = {
+        type           = "String"
+        description    = "(Optional) Port number of SSH server on the instance"
+        allowedPattern = "^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
+        default        = tostring(var.ssm_session_ssh_port_number)
+      }
+    }
+    properties = {
+      portNumber = "{{ portNumber }}"
     }
     inputs = {
       s3BucketName        = var.ssm_session_log_s3_bucket_id

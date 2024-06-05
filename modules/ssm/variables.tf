@@ -22,6 +22,12 @@ variable "ssm_session_idle_session_timeout" {
   default     = 60
 }
 
+variable "ssm_session_ssh_port_number" {
+  description = "SSM session SSH port number"
+  type        = number
+  default     = 22
+}
+
 variable "ssm_session_log_s3_bucket_id" {
   description = "SSM session log S3 IAM policy ARN"
   type        = string

@@ -37,40 +37,50 @@ Installation
     $ terragrunt run-all apply --terragrunt-working-dir='envs/dev/' --terragrunt-non-interactive
     ```
 
+7.  Retrieve the session document name, the EC2 instance ID, and the private key PEM name.
+
+    ```sh
+    $ terragrunt output --terragrunt-working-dir='envs/dev/ssm/' -raw ssm_session_document_name
+    $ terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_instance_id_ssm_parameter_name
+    $ terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_private_key_pem_ssm_parameter_name
+    ```
+
 Usage
 -----
 
 1.  Use the EC2 instance. (`create_ec2_instance = true`)
 
-    Option 1:   Start a session and log session data using Amazon CloudWatch Logs. (`use_ssh = false`)
+    Option 1:   Start a session using AWS CLI.
+    (Replace `slc-dev-ssm-session-document` and `/slc/dev/ec2-instance-id/slc-dev-ec2-instance`.)
 
     ```sh
     $ aws ssm start-session \
-        --document-name "$(terragrunt output --terragrunt-working-dir='envs/dev/ssm/' -raw ssm_session_document_name)" \
+        --document-name "slc-dev-ssm-session-document" \
         --target "$( \
           aws ssm get-parameter \
-            --name "$(terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_instance_id_ssm_parameter_name)" \
+            --name "/slc/dev/ec2-instance-id/slc-dev-ec2-instance" \
             --query Parameter.Value \
             --output text \
         )"
     ```
 
-    Option 2:   Start a session using SSH. (`use_ssh = true`)
+    Option 2:   Start a session using SSH.
+    (Replace `/slc/dev/ec2-private-key-pem/slc-dev-ec2-key-pair`, `slc-dev-ssm-session-document`, and `/slc/dev/ec2-public-ip/slc-dev-ec2-instance`.)
 
     ```sh
     $ aws ssm get-parameter \
-        --name "$(terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_private_key_pem_ssm_parameter_name)" \
+        --name "/slc/dev/ec2-private-key-pem/slc-dev-ec2-key-pair" \
         --query Parameter.Value \
         --output text \
         --with-decryption \
         > slc-dev-ec2-key-pair.pem
     $ chmod 600 slc-dev-ec2-key-pair.pem
     $ ssh \
-        -o ProxyCommand="aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'" \
+        -o ProxyCommand="aws ssm start-session --target %h --document-name slc-dev-ssm-session-document --parameters 'portNumber=%p'" \
         -i slc-dev-ec2-key-pair.pem \
         "ec2-user@$( \
           aws ssm get-parameter \
-            --name "$(terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_instance_id_ssm_parameter_name)" \
+            --name "/slc/dev/ec2-public-ip/slc-dev-ec2-instance" \
             --query Parameter.Value \
             --output text \
         )"

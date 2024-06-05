@@ -122,7 +122,7 @@ resource "aws_ssm_parameter" "server" {
 }
 
 resource "tls_private_key" "ssh" {
-  count     = var.ssm_session_client_iam_policy_arn == null ? 1 : 0
+  count     = var.use_ssh ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }

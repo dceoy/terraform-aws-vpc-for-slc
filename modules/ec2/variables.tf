@@ -55,3 +55,9 @@ variable "ec2_ebs_volume_size" {
   type        = number
   default     = 32
 }
+
+variable "use_ssh" {
+  description = "Use SSH for SSM session"
+  type        = bool
+  default     = true
+}

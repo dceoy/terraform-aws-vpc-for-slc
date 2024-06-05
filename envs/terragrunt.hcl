@@ -79,9 +79,9 @@ inputs = {
   ]
   create_ssm_session_document      = true
   ssm_session_idle_session_timeout = 60
+  ssm_session_ssh_port_number      = 22
   create_ec2_instance              = true
   ec2_instance_type                = "t4g.small"
   ec2_ebs_volume_size              = 32
-  # s3_expiration_days   = null
-  # ec2_image_id             = null
+  use_ssh                          = true
 }
