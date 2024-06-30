@@ -20,8 +20,14 @@ variable "env_type" {
   default     = "dev"
 }
 
+variable "iam_role_force_detach_policies" {
+  description = "Whether to force detaching any IAM policies the IAM role has before destroying it"
+  type        = bool
+  default     = true
+}
+
 variable "create_ec2_instance" {
-  description = "Create an EC2 instance"
+  description = "Whether to create an EC2 instance"
   type        = bool
   default     = true
 }
@@ -57,7 +63,7 @@ variable "ec2_ebs_volume_size" {
 }
 
 variable "use_ssh" {
-  description = "Use SSH for SSM session"
+  description = "Whether to use SSH for SSM session"
   type        = bool
   default     = true
 }

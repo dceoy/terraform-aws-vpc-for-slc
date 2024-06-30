@@ -84,9 +84,10 @@ resource "aws_iam_instance_profile" "server" {
 }
 
 resource "aws_iam_role" "server" {
-  name        = "${var.system_name}-${var.env_type}-ec2-instance-role"
-  description = "EC2 instance IAM role"
-  path        = "/"
+  name                  = "${var.system_name}-${var.env_type}-ec2-instance-role"
+  description           = "EC2 instance IAM role"
+  force_detach_policies = var.iam_role_force_detach_policies
+  path                  = "/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -151,9 +152,10 @@ resource "aws_ssm_parameter" "ssh" {
 }
 
 resource "aws_iam_role" "session" {
-  name        = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
-  description = "EC2 SSM session IAM role"
-  path        = "/"
+  name                  = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
+  description           = "EC2 SSM session IAM role"
+  force_detach_policies = var.iam_role_force_detach_policies
+  path                  = "/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

@@ -29,7 +29,7 @@ variable "s3_expiration_days" {
 }
 
 variable "s3_force_destroy" {
-  description = "S3 force destroy"
+  description = "Whether to delete all objects from the bucket when destroying the S3 bucket"
   type        = bool
   default     = true
 }

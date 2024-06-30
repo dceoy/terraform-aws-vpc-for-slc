@@ -11,7 +11,7 @@ variable "env_type" {
 }
 
 variable "create_ssm_session_document" {
-  description = "Create a SSM session document"
+  description = "Whether to create an SSM session document"
   type        = bool
   default     = true
 }

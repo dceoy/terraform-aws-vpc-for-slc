@@ -80,6 +80,7 @@ inputs = {
   create_ssm_session_document      = true
   ssm_session_idle_session_timeout = 60
   ssm_session_ssh_port_number      = 22
+  iam_role_force_detach_policies   = true
   create_ec2_instance              = true
   ec2_instance_type                = "t4g.small"
   ec2_ebs_volume_size              = 32
