@@ -19,3 +19,4 @@ jobs:
     with:
       search-path: .
       terraform-version: latest
+      terragrunt-version: latest
