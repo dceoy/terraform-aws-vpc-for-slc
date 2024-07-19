@@ -10,6 +10,10 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: terraform
-    directory: /
+    directory: /modules/kms/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /modules/ec2/
     schedule:
       interval: daily
