@@ -10,6 +10,42 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: terraform
-    directory: /
+    directory: /modules/kms/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /modules/ec2/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/kms/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/s3/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/vpc/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/subnet/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/nat/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/vpce/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/ssm/
+    schedule:
+      interval: daily
+  - package-ecosystem: terraform
+    directory: /envs/dev/ec2/
     schedule:
       interval: daily
