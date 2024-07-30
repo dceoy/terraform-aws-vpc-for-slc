@@ -1,5 +1,6 @@
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
+  expose = true
 }
 
 dependency "s3" {
@@ -20,7 +21,7 @@ dependency "kms" {
 
 inputs = {
   ssm_session_log_s3_bucket_id = dependency.s3.outputs.log_s3_bucket_id
-  kms_key_arn                  = dependency.kms.outputs.kms_key_arn
+  kms_key_arn                  = include.root.inputs.create_kms_key ? dependency.kms.outputs.kms_key_arn : null
 }
 
 terraform {
