@@ -66,6 +66,7 @@ inputs = {
   s3_force_destroy                          = true
   s3_noncurrent_version_expiration_days     = 7
   s3_abort_incomplete_multipart_upload_days = 7
+  s3_expired_object_delete_marker           = true
   vpc_cidr_block                            = "10.0.0.0/16"
   vpc_secondary_cidr_blocks                 = []
   cloudwatch_logs_retention_in_days         = 30
