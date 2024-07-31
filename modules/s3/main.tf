@@ -122,19 +122,19 @@ resource "aws_iam_policy" "log" {
     Statement = concat(
       [
         {
-          Sid    = "AllowS3BucketAccess"
+          Sid    = "AllowS3GetAndListActions"
           Effect = "Allow"
           Action = [
-            "s3:Describe*",
             "s3:Get*",
-            "s3:List*",
-            "s3-object-lambda:Get*",
-            "s3-object-lambda:List*"
+            "s3:List*"
           ]
-          Resource = [
-            aws_s3_bucket.log[count.index].arn,
-            "${aws_s3_bucket.log[count.index].arn}/*"
-          ]
+          Resource = [aws_s3_bucket.log[count.index].arn]
+        },
+        {
+          Sid      = "AllowS3PutObject"
+          Effect   = "Allow"
+          Action   = ["s3:PutObject"]
+          Resource = ["${aws_s3_bucket.log[count.index].arn}/*"]
         }
       ],
       (
