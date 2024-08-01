@@ -3,18 +3,18 @@ include "root" {
   expose = true
 }
 
-dependency "s3" {
-  config_path = "../s3"
-  mock_outputs = {
-    log_s3_bucket_id = "log-s3-bucket"
-  }
-  mock_outputs_merge_strategy_with_state = "shallow"
-}
-
 dependency "kms" {
   config_path = "../kms"
   mock_outputs = {
     kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+  }
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
+dependency "s3" {
+  config_path = "../s3"
+  mock_outputs = {
+    log_s3_bucket_id = "log-s3-bucket"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }

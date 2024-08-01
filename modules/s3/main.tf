@@ -122,12 +122,9 @@ resource "aws_iam_policy" "log" {
     Statement = concat(
       [
         {
-          Sid    = "AllowS3GetAndListActions"
-          Effect = "Allow"
-          Action = [
-            "s3:Get*",
-            "s3:List*"
-          ]
+          Sid      = "AllowS3GetBucketAcl"
+          Effect   = "Allow"
+          Action   = ["s3:GetBucketAcl"]
           Resource = [aws_s3_bucket.log[count.index].arn]
         },
         {
@@ -135,18 +132,26 @@ resource "aws_iam_policy" "log" {
           Effect   = "Allow"
           Action   = ["s3:PutObject"]
           Resource = ["${aws_s3_bucket.log[count.index].arn}/*"]
+          Condition = {
+            StringEquals = {
+              "s3:x-amz-acl"      = "bucket-owner-full-control"
+              "AWS:SourceAccount" = local.account_id
+            }
+          }
         }
       ],
       (
         var.kms_key_arn != null ? [
           {
-            Sid    = "AllowKMSAccess"
-            Effect = "Allow"
-            Action = [
-              "kms:Decrypt",
-              "kms:GenerateDataKey"
-            ]
+            Sid      = "AllowKMSAccess"
+            Effect   = "Allow"
+            Action   = ["kms:GenerateDataKey"]
             Resource = [var.kms_key_arn]
+            Condition = {
+              StringEquals = {
+                "aws:SourceAccount" = local.account_id
+              }
+            }
           },
         ] : []
       )
