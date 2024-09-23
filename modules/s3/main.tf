@@ -1,27 +1,27 @@
 # trivy:ignore:AVD-AWS-0089
-resource "aws_s3_bucket" "log" {
-  count         = var.create_log_s3_bucket ? 1 : 0
-  bucket        = local.log_s3_bucket_name
+resource "aws_s3_bucket" "awslogs" {
+  count         = var.create_awslogs_s3_bucket ? 1 : 0
+  bucket        = local.awslogs_s3_bucket_name
   force_destroy = var.s3_force_destroy
   tags = {
-    Name       = local.log_s3_bucket_name
+    Name       = local.awslogs_s3_bucket_name
     SystemName = var.system_name
     EnvType    = var.env_type
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "log" {
-  count                   = length(aws_s3_bucket.log) > 0 ? 1 : 0
-  bucket                  = aws_s3_bucket.log[count.index].id
+resource "aws_s3_bucket_public_access_block" "awslogs" {
+  count                   = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+  bucket                  = aws_s3_bucket.awslogs[count.index].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "log" {
-  count  = length(aws_s3_bucket.log) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.log[count.index].id
+resource "aws_s3_bucket_server_side_encryption_configuration" "awslogs" {
+  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.awslogs[count.index].id
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
@@ -31,17 +31,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "log" {
-  count  = length(aws_s3_bucket.log) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.log[count.index].id
+resource "aws_s3_bucket_versioning" "awslogs" {
+  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.awslogs[count.index].id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "log" {
-  count  = length(aws_s3_bucket.log) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.log[count.index].id
+resource "aws_s3_bucket_lifecycle_configuration" "awslogs" {
+  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.awslogs[count.index].id
   rule {
     status = "Enabled"
     id     = "Move-to-Intelligent-Tiering-after-0day"
@@ -62,12 +62,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "log" {
   }
 }
 
-resource "aws_s3_bucket_policy" "log" {
-  count  = length(aws_s3_bucket.log) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.log[count.index].id
+resource "aws_s3_bucket_policy" "awslogs" {
+  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.awslogs[count.index].id
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "${aws_s3_bucket.log[count.index].id}-policy"
+    Id      = "${aws_s3_bucket.awslogs[count.index].id}-policy"
     Statement = [
       {
         Sid    = "DeliverLogsGetS3BucketAclAndListS3Bucket"
@@ -79,7 +79,7 @@ resource "aws_s3_bucket_policy" "log" {
           "s3:GetBucketAcl",
           "s3:ListBucket"
         ]
-        Resource = [aws_s3_bucket.log[count.index].arn]
+        Resource = [aws_s3_bucket.awslogs[count.index].arn]
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = local.account_id
@@ -96,7 +96,7 @@ resource "aws_s3_bucket_policy" "log" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action   = ["s3:PutObject"]
-        Resource = ["${aws_s3_bucket.log[count.index].arn}/*"]
+        Resource = ["${aws_s3_bucket.awslogs[count.index].arn}/*"]
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control"
@@ -112,8 +112,8 @@ resource "aws_s3_bucket_policy" "log" {
 }
 
 # trivy:ignore:AVD-AWS-0057
-resource "aws_iam_policy" "log" {
-  count       = length(aws_s3_bucket.log) > 0 ? 1 : 0
+resource "aws_iam_policy" "awslogs" {
+  count       = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-s3-iam-policy"
   description = "S3 IAM policy"
   path        = "/"
@@ -125,13 +125,13 @@ resource "aws_iam_policy" "log" {
           Sid      = "AllowS3GetBucketAcl"
           Effect   = "Allow"
           Action   = ["s3:GetBucketAcl"]
-          Resource = [aws_s3_bucket.log[count.index].arn]
+          Resource = [aws_s3_bucket.awslogs[count.index].arn]
         },
         {
           Sid      = "AllowS3PutObject"
           Effect   = "Allow"
           Action   = ["s3:PutObject"]
-          Resource = ["${aws_s3_bucket.log[count.index].arn}/*"]
+          Resource = ["${aws_s3_bucket.awslogs[count.index].arn}/*"]
           Condition = {
             StringEquals = {
               "s3:x-amz-acl"      = "bucket-owner-full-control"

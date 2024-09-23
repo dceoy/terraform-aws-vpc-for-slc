@@ -30,8 +30,8 @@ variable "vpc_secondary_cidr_blocks" {
   }
 }
 
-variable "vpc_flow_log_s3_bucket_id" {
-  description = "VPC flow log S3 IAM policy ARN"
+variable "vpc_logs_s3_bucket_id" {
+  description = "VPC flow logs S3 bucket ID"
   type        = string
   default     = null
 }

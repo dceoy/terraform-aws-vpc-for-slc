@@ -25,7 +25,7 @@ resource "aws_ssm_document" "session" {
       portNumber = "{{ portNumber }}"
     }
     inputs = {
-      s3BucketName        = var.ssm_session_log_s3_bucket_id
+      s3BucketName        = var.ssm_logs_s3_bucket_id
       s3KeyPrefix         = var.ssm_s3_key_prefix
       s3EncryptionEnabled = true
       kmsKeyId            = var.kms_key_arn

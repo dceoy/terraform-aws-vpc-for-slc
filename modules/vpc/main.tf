@@ -19,10 +19,10 @@ resource "aws_vpc_ipv4_cidr_block_association" "main" {
 }
 
 resource "aws_flow_log" "log" {
-  count                = var.vpc_flow_log_s3_bucket_id != null ? 1 : 0
+  count                = var.vpc_logs_s3_bucket_id != null ? 1 : 0
   vpc_id               = aws_vpc.main.id
   log_destination_type = "s3"
-  log_destination      = "arn:aws:s3:::${var.vpc_flow_log_s3_bucket_id}/${var.vpc_s3_key_prefix}"
+  log_destination      = "arn:aws:s3:::${var.vpc_logs_s3_bucket_id}/${var.vpc_s3_key_prefix}"
   traffic_type         = "ALL"
   tags = {
     Name       = "${aws_vpc.main.tags.Name}-flow-log"

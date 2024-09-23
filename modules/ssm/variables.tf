@@ -28,8 +28,8 @@ variable "ssm_session_ssh_port_number" {
   default     = 22
 }
 
-variable "ssm_session_log_s3_bucket_id" {
-  description = "SSM session log S3 IAM policy ARN"
+variable "ssm_logs_s3_bucket_id" {
+  description = "SSM session logs S3 bucket ID"
   type        = string
   default     = null
 }
