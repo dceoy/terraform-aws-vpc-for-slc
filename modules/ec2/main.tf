@@ -169,61 +169,63 @@ resource "aws_iam_role" "session" {
     ]
   })
   managed_policy_arns = compact([var.ssm_session_client_iam_policy_arn])
-  inline_policy {
-    name = "${var.system_name}-${var.env_type}-ec2-ssm-session-policy"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = concat(
-        [
-          {
-            Effect   = "Allow"
-            Action   = ["ssm:StartSession"]
-            Resource = ["arn:aws:ec2:*:*:instance/*"]
-            Condition = {
-              StringEquals = {
-                "aws:ResourceTag/SystemName" = var.system_name
-                "aws:ResourceTag/EnvType"    = var.env_type
-              }
-            }
-          },
-          {
-            Effect = "Allow"
-            Action = [
-              "ssm:GetParameters",
-              "ssm:GetParameter",
-              "ssm:DescribeParameters"
-            ]
-            Resource = ["arn:aws:ssm:*:*:parameter/*"]
-            Condition = {
-              StringEquals = {
-                "aws:ResourceTag/SystemName" = var.system_name
-                "aws:ResourceTag/EnvType"    = var.env_type
-              }
-            }
-          }
-        ],
-        (
-          var.ssm_session_client_iam_policy_arn == null ? [
-            {
-              Effect = "Allow"
-              Action = ["ssm:StartSession"]
-              Resource = [
-                "arn:aws:ssm:${local.region}:${local.account_id}:document/AWS-StartSSHSession"
-              ]
-              Condition = {
-                BoolIfExists = {
-                  "ssm:SessionDocumentAccessCheck" = "true"
-                }
-              }
-            }
-          ] : []
-        )
-      )
-    })
-  }
   tags = {
     Name       = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
+}
+
+resource "aws_iam_role_policy" "session" {
+  name = "${var.system_name}-${var.env_type}-ec2-ssm-session-policy"
+  role = aws_iam_role.session.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = concat(
+      [
+        {
+          Effect   = "Allow"
+          Action   = ["ssm:StartSession"]
+          Resource = ["arn:aws:ec2:*:*:instance/*"]
+          Condition = {
+            StringEquals = {
+              "aws:ResourceTag/SystemName" = var.system_name
+              "aws:ResourceTag/EnvType"    = var.env_type
+            }
+          }
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "ssm:GetParameters",
+            "ssm:GetParameter",
+            "ssm:DescribeParameters"
+          ]
+          Resource = ["arn:aws:ssm:*:*:parameter/*"]
+          Condition = {
+            StringEquals = {
+              "aws:ResourceTag/SystemName" = var.system_name
+              "aws:ResourceTag/EnvType"    = var.env_type
+            }
+          }
+        }
+      ],
+      (
+        var.ssm_session_client_iam_policy_arn == null ? [
+          {
+            Effect = "Allow"
+            Action = ["ssm:StartSession"]
+            Resource = [
+              "arn:aws:ssm:${local.region}:${local.account_id}:document/AWS-StartSSHSession"
+            ]
+            Condition = {
+              BoolIfExists = {
+                "ssm:SessionDocumentAccessCheck" = "true"
+              }
+            }
+          }
+        ] : []
+      )
+    )
+  })
 }

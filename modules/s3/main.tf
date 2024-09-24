@@ -83,7 +83,7 @@ resource "aws_s3_bucket_policy" "s3logs" {
           Service = "logging.s3.amazonaws.com"
         }
         Action   = ["s3:PutObject"]
-        Resource = "${aws_s3_bucket.storage["s3logs"].id}/*"
+        Resource = ["${aws_s3_bucket.storage["s3logs"].arn}/*"]
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = local.account_id
