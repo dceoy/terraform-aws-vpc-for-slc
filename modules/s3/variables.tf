@@ -10,8 +10,20 @@ variable "env_type" {
   default     = "dev"
 }
 
+variable "create_io_s3_bucket" {
+  description = "Whether to create an S3 bucket for IO"
+  type        = bool
+  default     = true
+}
+
 variable "create_awslogs_s3_bucket" {
   description = "Whether to create an AWS service logs S3 bucket"
+  type        = bool
+  default     = true
+}
+
+variable "create_s3logs_s3_bucket" {
+  description = "Whether to create an S3 server access logs S3 bucket"
   type        = bool
   default     = true
 }

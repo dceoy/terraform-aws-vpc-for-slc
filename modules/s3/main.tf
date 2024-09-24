@@ -1,27 +1,34 @@
 # trivy:ignore:AVD-AWS-0089
-resource "aws_s3_bucket" "awslogs" {
-  count         = var.create_awslogs_s3_bucket ? 1 : 0
-  bucket        = local.awslogs_s3_bucket_name
+resource "aws_s3_bucket" "storage" {
+  for_each      = local.s3_bucket_names
+  bucket        = each.value
   force_destroy = var.s3_force_destroy
   tags = {
-    Name       = local.awslogs_s3_bucket_name
+    Name       = each.value
     SystemName = var.system_name
     EnvType    = var.env_type
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "awslogs" {
-  count                   = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
-  bucket                  = aws_s3_bucket.awslogs[count.index].id
+resource "aws_s3_bucket_logging" "storage" {
+  for_each      = { for k, b in aws_s3_bucket.storage : k => b if k != "s3logs" }
+  bucket        = each.value.id
+  target_bucket = aws_s3_bucket.storage["s3logs"].id
+  target_prefix = "${each.value.id}/"
+}
+
+resource "aws_s3_bucket_public_access_block" "storage" {
+  for_each                = aws_s3_bucket.storage
+  bucket                  = each.value.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "awslogs" {
-  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.awslogs[count.index].id
+resource "aws_s3_bucket_server_side_encryption_configuration" "storage" {
+  for_each = aws_s3_bucket.storage
+  bucket   = each.value.id
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
@@ -31,17 +38,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "awslogs" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "awslogs" {
-  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.awslogs[count.index].id
+resource "aws_s3_bucket_versioning" "storage" {
+  for_each = aws_s3_bucket.storage
+  bucket   = each.value.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "awslogs" {
-  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.awslogs[count.index].id
+resource "aws_s3_bucket_lifecycle_configuration" "storage" {
+  for_each = aws_s3_bucket.storage
+  bucket   = each.value.id
   rule {
     status = "Enabled"
     id     = "Move-to-Intelligent-Tiering-after-0day"
@@ -62,48 +69,27 @@ resource "aws_s3_bucket_lifecycle_configuration" "awslogs" {
   }
 }
 
-resource "aws_s3_bucket_policy" "awslogs" {
-  count  = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.awslogs[count.index].id
+resource "aws_s3_bucket_policy" "s3logs" {
+  count  = contains(keys(aws_s3_bucket.storage), "s3logs") ? 1 : 0
+  bucket = aws_s3_bucket.storage["s3logs"].id
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "${aws_s3_bucket.awslogs[count.index].id}-policy"
+    Id      = "${aws_s3_bucket.storage["s3logs"].id}-policy"
     Statement = [
       {
-        Sid    = "DeliverLogsGetS3BucketAclAndListS3Bucket"
+        Sid    = "S3PutS3ServerAccessLogs"
         Effect = "Allow"
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action = [
-          "s3:GetBucketAcl",
-          "s3:ListBucket"
-        ]
-        Resource = [aws_s3_bucket.awslogs[count.index].arn]
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = local.account_id
-          }
-          ArnLike = {
-            "aws:SourceArn" = "arn:aws:logs:${local.region}:${local.account_id}:*"
-          }
-        }
-      },
-      {
-        Sid    = "DeliverLogsPutS3Buckets"
-        Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = "logging.s3.amazonaws.com"
         }
         Action   = ["s3:PutObject"]
-        Resource = ["${aws_s3_bucket.awslogs[count.index].arn}/*"]
+        Resource = "${aws_s3_bucket.storage["s3logs"].id}/*"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl"      = "bucket-owner-full-control"
             "aws:SourceAccount" = local.account_id
           }
           ArnLike = {
-            "aws:SourceArn" = "arn:aws:logs:${local.region}:${local.account_id}:*"
+            "aws:SourceArn" = "arn:aws:s3:::${var.system_name}-${var.env_type}-*"
           }
         }
       }
@@ -112,8 +98,8 @@ resource "aws_s3_bucket_policy" "awslogs" {
 }
 
 # trivy:ignore:AVD-AWS-0057
-resource "aws_iam_policy" "awslogs" {
-  count       = length(aws_s3_bucket.awslogs) > 0 ? 1 : 0
+resource "aws_iam_policy" "storage" {
+  count       = length(aws_s3_bucket.storage) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-s3-iam-policy"
   description = "S3 IAM policy"
   path        = "/"
@@ -122,37 +108,44 @@ resource "aws_iam_policy" "awslogs" {
     Statement = concat(
       [
         {
-          Sid      = "AllowS3GetBucketAcl"
-          Effect   = "Allow"
-          Action   = ["s3:GetBucketAcl"]
-          Resource = [aws_s3_bucket.awslogs[count.index].arn]
-        },
-        {
-          Sid      = "AllowS3PutObject"
-          Effect   = "Allow"
-          Action   = ["s3:PutObject"]
-          Resource = ["${aws_s3_bucket.awslogs[count.index].arn}/*"]
-          Condition = {
-            StringEquals = {
-              "s3:x-amz-acl"      = "bucket-owner-full-control"
-              "AWS:SourceAccount" = local.account_id
-            }
-          }
+          Sid    = "AllowS3GetAndListActions"
+          Effect = "Allow"
+          Action = [
+            "s3:Describe*",
+            "s3:Get*",
+            "s3:List*",
+            "s3-object-lambda:Get*",
+            "s3-object-lambda:List*"
+          ]
+          Resource = flatten(
+            [for a in values(aws_s3_bucket.storage)[*].arn : [a, "${a}/*"]]
+          )
         }
       ],
       (
+        contains(keys(aws_s3_bucket.storage), "io") ? [
+          {
+            Sid    = "AllowS3PutObjectActions"
+            Effect = "Allow"
+            Action = [
+              "s3:PutObject*",
+              "s3:DeleteObject*"
+            ]
+            Resource = ["${aws_s3_bucket.storage["io"].arn}/*"]
+          }
+        ] : []
+      ),
+      (
         var.kms_key_arn != null ? [
           {
-            Sid      = "AllowKMSAccess"
-            Effect   = "Allow"
-            Action   = ["kms:GenerateDataKey"]
+            Sid    = "AllowKMSAccess"
+            Effect = "Allow"
+            Action = [
+              "kms:Decrypt",
+              "kms:GenerateDataKey"
+            ]
             Resource = [var.kms_key_arn]
-            Condition = {
-              StringEquals = {
-                "aws:SourceAccount" = local.account_id
-              }
-            }
-          },
+          }
         ] : []
       )
     )
