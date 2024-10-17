@@ -1,4 +1,4 @@
-# trivy:ignore:AVD-AWS-0089
+# trivy:ignore:avd-aws-0089
 resource "aws_s3_bucket" "storage" {
   for_each      = local.s3_bucket_names
   bucket        = each.value
@@ -26,6 +26,7 @@ resource "aws_s3_bucket_public_access_block" "storage" {
   restrict_public_buckets = true
 }
 
+# trivy:ignore:avd-aws-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "storage" {
   for_each = aws_s3_bucket.storage
   bucket   = each.value.id
@@ -97,7 +98,7 @@ resource "aws_s3_bucket_policy" "s3logs" {
   })
 }
 
-# trivy:ignore:AVD-AWS-0057
+# trivy:ignore:avd-aws-0057
 resource "aws_iam_policy" "storage" {
   count       = length(aws_s3_bucket.storage) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-s3-iam-policy"

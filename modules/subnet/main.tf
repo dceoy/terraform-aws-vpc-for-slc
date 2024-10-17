@@ -29,7 +29,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 }
 
-# trivy:ignore:AVD-AWS-0104
+# trivy:ignore:avd-aws-0104
 resource "aws_security_group" "private" {
   count       = length(aws_subnet.private) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-sg-private"
@@ -83,7 +83,7 @@ resource "aws_vpc_endpoint" "dynamodb_gateway" {
   }
 }
 
-# trivy:ignore:AVD-AWS-0164
+# trivy:ignore:avd-aws-0164
 resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
   cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + local.az_count)
