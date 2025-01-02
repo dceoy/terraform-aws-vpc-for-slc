@@ -57,27 +57,14 @@ resource "aws_security_group" "private" {
   }
 }
 
-resource "aws_vpc_endpoint" "s3_gateway" {
-  count             = length(aws_route_table.private) > 0 ? 1 : 0
+resource "aws_vpc_endpoint" "gateway" {
+  for_each          = toset(length(aws_route_table.private) > 0 ? ["s3", "dynamodb"] : [])
   vpc_id            = var.vpc_id
-  service_name      = "com.amazonaws.${local.region}.s3"
+  service_name      = "com.amazonaws.${local.region}.${each.key}"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = aws_route_table.private[*].id
   tags = {
-    Name       = "${var.system_name}-${var.env_type}-vpce-gw-s3"
-    SystemName = var.system_name
-    EnvType    = var.env_type
-  }
-}
-
-resource "aws_vpc_endpoint" "dynamodb_gateway" {
-  count             = length(aws_route_table.private) > 0 ? 1 : 0
-  vpc_id            = var.vpc_id
-  service_name      = "com.amazonaws.${local.region}.dynamodb"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = aws_route_table.private[*].id
-  tags = {
-    Name       = "${var.system_name}-${var.env_type}-vpce-gw-dynamodb"
+    Name       = "${var.system_name}-${var.env_type}-vpce-gw-${each.key}"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

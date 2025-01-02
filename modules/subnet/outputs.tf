@@ -23,14 +23,19 @@ output "private_security_group_id" {
   value       = length(aws_security_group.private) > 0 ? aws_security_group.private[0].id : null
 }
 
-output "s3_gateway_endpoint" {
-  description = "S3 gateway endpoint"
-  value       = length(aws_vpc_endpoint.s3_gateway) > 0 ? aws_vpc_endpoint.s3_gateway[0].id : null
+output "vpc_gateway_endpoint_ids" {
+  description = "VPC gateway endpoint IDs"
+  value       = { for k, v in aws_vpc_endpoint.gateway : k => v.id }
 }
 
-output "dynamodb_gateway_endpoint" {
-  description = "DynamoDB gateway endpoint"
-  value       = length(aws_vpc_endpoint.dynamodb_gateway) > 0 ? aws_vpc_endpoint.dynamodb_gateway[0].id : null
+output "vpc_gateway_endpoint_cidr_blocks" {
+  description = "VPC gateway endpoint CIDR blocks for the exposed AWS service"
+  value       = { for k, v in aws_vpc_endpoint.gateway : k => v.cidr_blocks }
+}
+
+output "vpc_gateway_endpoint_prefix_list_ids" {
+  description = "VPC gateway endpoint prefix list ID of the exposed AWS service"
+  value       = { for k, v in aws_vpc_endpoint.gateway : k => v.prefix_list_id }
 }
 
 output "public_subnet_azs" {
