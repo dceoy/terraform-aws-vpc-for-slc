@@ -1,8 +1,9 @@
 # trivy:ignore:avd-aws-0178
 resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr_block
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  cidr_block                       = var.vpc_cidr_block
+  enable_dns_support               = true
+  enable_dns_hostnames             = true
+  assign_generated_ipv6_cidr_block = var.vpc_assign_generated_ipv6_cidr_block
   tags = {
     Application = local.vpc_name
     Network     = "Public"

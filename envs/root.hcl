@@ -31,17 +31,17 @@ remote_state {
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "aws" {
-  region = "${local.env_vars.locals.region}"
-  default_tags {
-    tags = {
-      SystemName = "${local.env_vars.locals.system_name}"
-      EnvType    = "${local.env_vars.locals.env_type}"
+  contents  = <<-EOF
+  provider "aws" {
+    region = "${local.env_vars.locals.region}"
+    default_tags {
+      tags = {
+        SystemName = "${local.env_vars.locals.system_name}"
+        EnvType    = "${local.env_vars.locals.env_type}"
+      }
     }
   }
-}
-EOF
+  EOF
 }
 
 catalog {
@@ -72,6 +72,7 @@ inputs = {
   s3_expired_object_delete_marker           = true
   vpc_cidr_block                            = "10.0.0.0/16"
   vpc_secondary_cidr_blocks                 = []
+  vpc_assign_generated_ipv6_cidr_block      = false
   cloudwatch_logs_retention_in_days         = 30
   private_subnet_count                      = 1
   public_subnet_count                       = 1

@@ -30,6 +30,12 @@ variable "vpc_secondary_cidr_blocks" {
   }
 }
 
+variable "vpc_assign_generated_ipv6_cidr_block" {
+  description = "Whether to assign a generated IPv6 CIDR block to the VPC"
+  type        = bool
+  default     = false
+}
+
 variable "vpc_logs_s3_bucket_id" {
   description = "VPC flow logs S3 bucket ID"
   type        = string
