@@ -1,15 +1,14 @@
 resource "aws_subnet" "private" {
   count                   = var.private_subnet_count
   cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index)
-  availability_zone       = local.private_subnet_azs[count.index]
+  availability_zone       = local.azs[count.index]
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = false
   tags = {
-    Application = "${var.system_name}-${var.env_type}-subnet-private${count.index}-${local.private_subnet_azs[count.index]}"
-    Network     = "Private"
-    Name        = "${var.system_name}-${var.env_type}-subnet-private${count.index}-${local.private_subnet_azs[count.index]}"
-    SystemName  = var.system_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-subnet-private${count.index}-${local.azs[count.index]}"
+    Network    = "Private"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -18,6 +17,7 @@ resource "aws_route_table" "private" {
   vpc_id = var.vpc_id
   tags = {
     Name       = "${var.system_name}-${var.env_type}-rtb-private${count.index}"
+    Network    = "Private"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -76,16 +76,15 @@ resource "aws_vpc_endpoint" "gateway" {
 # trivy:ignore:AVD-AWS-0164
 resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
-  cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + local.az_count)
-  availability_zone       = local.public_subnet_azs[count.index]
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + length(local.azs))
+  availability_zone       = local.azs[count.index]
   vpc_id                  = var.vpc_id
   map_public_ip_on_launch = true
   tags = {
-    Application = "${var.system_name}-${var.env_type}-subnet-public${count.index}-${local.public_subnet_azs[count.index]}"
-    Network     = "Public"
-    Name        = "${var.system_name}-${var.env_type}-subnet-public${count.index}-${local.public_subnet_azs[count.index]}"
-    SystemName  = var.system_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-subnet-public${count.index}-${local.azs[count.index]}"
+    Network    = "Public"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 
@@ -98,6 +97,7 @@ resource "aws_route_table" "public" {
   }
   tags = {
     Name       = "${var.system_name}-${var.env_type}-rtb-public"
+    Network    = "Public"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
@@ -107,11 +107,10 @@ resource "aws_internet_gateway" "public" {
   count  = length(aws_subnet.public) > 0 ? 1 : 0
   vpc_id = var.vpc_id
   tags = {
-    Application = "${var.system_name}-${var.env_type}-igw"
-    Network     = "Public"
-    Name        = "${var.system_name}-${var.env_type}-igw"
-    SystemName  = var.system_name
-    EnvType     = var.env_type
+    Name       = "${var.system_name}-${var.env_type}-igw"
+    Network    = "Public"
+    SystemName = var.system_name
+    EnvType    = var.env_type
   }
 }
 

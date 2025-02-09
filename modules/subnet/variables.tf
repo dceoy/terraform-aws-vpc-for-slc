@@ -1,8 +1,3 @@
-variable "vpc_id" {
-  description = "VPC ID"
-  type        = string
-}
-
 variable "system_name" {
   description = "System name"
   type        = string
@@ -13,6 +8,11 @@ variable "env_type" {
   description = "Environment type"
   type        = string
   default     = "dev"
+}
+
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
 }
 
 variable "private_subnet_count" {

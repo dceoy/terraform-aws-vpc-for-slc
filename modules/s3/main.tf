@@ -33,8 +33,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "storage" {
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
-      kms_master_key_id = var.kms_key_arn
-      sse_algorithm     = var.kms_key_arn != null ? "aws:kms" : "AES256"
+      kms_master_key_id = each.key != "s3logs" ? var.kms_key_arn : null
+      sse_algorithm     = each.key != "s3logs" && var.kms_key_arn != null ? "aws:kms" : "AES256"
     }
   }
 }

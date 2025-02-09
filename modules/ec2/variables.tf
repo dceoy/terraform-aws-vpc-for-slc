@@ -1,13 +1,3 @@
-variable "private_subnet_id" {
-  description = "Private subnet ID"
-  type        = string
-}
-
-variable "security_group_ids" {
-  description = "Security group IDs"
-  type        = list(string)
-}
-
 variable "system_name" {
   description = "System name"
   type        = string
@@ -18,6 +8,16 @@ variable "env_type" {
   description = "Environment type"
   type        = string
   default     = "dev"
+}
+
+variable "private_subnet_id" {
+  description = "Private subnet ID"
+  type        = string
+}
+
+variable "security_group_ids" {
+  description = "Security group IDs"
+  type        = list(string)
 }
 
 variable "iam_role_force_detach_policies" {

@@ -47,9 +47,3 @@ variable "vpc_s3_key_prefix" {
   type        = string
   default     = "vpc"
 }
-
-variable "kms_key_arn" {
-  description = "KMS key ARN"
-  type        = string
-  default     = null
-}
