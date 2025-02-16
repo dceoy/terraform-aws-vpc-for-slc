@@ -18,11 +18,6 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "security_group_ids" {
-  description = "Security group IDs"
-  type        = list(string)
-}
-
 variable "vpc_interface_endpoint_services" {
   description = "VPC interface endpoint services"
   type        = list(string)
@@ -40,4 +35,10 @@ variable "vpc_interface_endpoint_services" {
     "logs",
     "kms"
   ]
+}
+
+variable "vpc_cidr_blocks" {
+  description = "CIDR blocks for VPC interface endpoint security group ingress"
+  type        = list(string)
+  default     = []
 }
