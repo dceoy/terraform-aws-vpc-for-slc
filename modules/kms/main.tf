@@ -17,7 +17,7 @@ resource "aws_kms_key" "custom" {
         Resource = "*"
       },
       {
-        Sid    = "S3EncryptS3AccessLogs"
+        Sid    = "AllowS3ToEncrypt"
         Effect = "Allow"
         Principal = {
           Service = "s3.amazonaws.com"

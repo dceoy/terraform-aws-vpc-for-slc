@@ -22,27 +22,27 @@ Installation
 4.  Initialize Terraform working directories.
 
     ```sh
-    $ terragrunt run-all init --terragrunt-working-dir='envs/dev/' -upgrade -reconfigure
+    $ terragrunt run-all init --working-dir='envs/dev/' -upgrade -reconfigure
     ```
 
 5.  Generates a speculative execution plan. (Optional)
 
     ```sh
-    $ terragrunt run-all plan --terragrunt-working-dir='envs/dev/'
+    $ terragrunt run-all plan --working-dir='envs/dev/'
     ```
 
 6.  Creates or updates infrastructure.
 
     ```sh
-    $ terragrunt run-all apply --terragrunt-working-dir='envs/dev/' --terragrunt-non-interactive
+    $ terragrunt run-all apply --working-dir='envs/dev/' --non-interactive
     ```
 
 7.  Retrieve the session document name, the EC2 instance ID, and the private key PEM name.
 
     ```sh
-    $ terragrunt output --terragrunt-working-dir='envs/dev/ssm/' -raw ssm_session_document_name
-    $ terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_instance_id_ssm_parameter_name
-    $ terragrunt output --terragrunt-working-dir='envs/dev/ec2/' -raw ec2_private_key_pem_ssm_parameter_name
+    $ terragrunt output --working-dir='envs/dev/ssm/' -raw ssm_session_document_name
+    $ terragrunt output --working-dir='envs/dev/ec2/' -raw ec2_instance_id_ssm_parameter_name
+    $ terragrunt output --working-dir='envs/dev/ec2/' -raw ec2_private_key_pem_ssm_parameter_name
     ```
 
 Usage
@@ -90,5 +90,5 @@ Cleanup
 -------
 
 ```sh
-$ terragrunt run-all destroy --terragrunt-working-dir='envs/dev/' --terragrunt-non-interactive
+$ terragrunt run-all destroy --working-dir='envs/dev/' --non-interactive
 ```
