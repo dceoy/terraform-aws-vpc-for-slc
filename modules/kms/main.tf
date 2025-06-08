@@ -35,6 +35,23 @@ resource "aws_kms_key" "custom" {
             "kms:ViaService" = "s3.*.amazonaws.com"
           }
         }
+      },
+      {
+        Sid    = "AllowDeliveryLogsToEncryptAndDecrypt"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = local.account_id
+          }
+        }
       }
     ]
   })
