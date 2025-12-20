@@ -4,7 +4,7 @@ data "aws_region" "current" {}
 
 locals {
   account_id = data.aws_caller_identity.current.account_id
-  region     = data.aws_region.current.name
+  region     = data.aws_region.current.id
   s3_bucket_names = {
     for k, v in {
       io      = var.create_io_s3_bucket
