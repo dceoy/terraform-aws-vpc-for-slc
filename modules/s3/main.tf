@@ -14,7 +14,7 @@ resource "aws_s3_bucket_logging" "storage" {
   for_each      = { for k, b in aws_s3_bucket.storage : k => b if k != "s3logs" }
   bucket        = each.value.id
   target_bucket = aws_s3_bucket.storage["s3logs"].id
-  target_prefix = "s3logs/${aws_s3_bucket.awslogs.id}/"
+  target_prefix = "s3logs/${each.value.id}/"
 }
 
 resource "aws_s3_bucket_public_access_block" "storage" {

@@ -5,6 +5,6 @@ data "aws_availability_zones" "az" {
 }
 
 locals {
-  region = data.aws_region.current.name
+  region = data.aws_region.current.id
   azs    = data.aws_availability_zones.az.names
 }
