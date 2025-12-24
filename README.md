@@ -1,19 +1,17 @@
-terraform-aws-vpc-for-slc
-=========================
+# terraform-aws-vpc-for-slc
 
 Terraform modules of Amazon VPC for serverless computing
 
 [![CI](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/ci.yml/badge.svg)](https://github.com/dceoy/terraform-aws-vpc-for-slc/actions/workflows/ci.yml)
 
-Installation
-------------
+## Installation
 
 1.  Check out the repository.
 
     ```sh
     $ git clone https://github.com/dceoy/terraform-aws-vpc-for-slc.git
     $ cd terraform-aws-vpc-for-slc
-    ````
+    ```
 
 2.  Install [AWS CLI](https://aws.amazon.com/cli/) and set `~/.aws/config` and `~/.aws/credentials`.
 
@@ -45,12 +43,11 @@ Installation
     $ terragrunt output --working-dir='envs/dev/ec2/' -raw ec2_private_key_pem_ssm_parameter_name
     ```
 
-Usage
------
+## Usage
 
 1.  Use the EC2 instance. (`create_ec2_instance = true`)
 
-    Option 1:   Start a session using AWS CLI.
+    Option 1: Start a session using AWS CLI.
     (Replace `slc-dev-ssm-session-document` and `/slc/dev/ec2-instance-id/slc-dev-ec2-instance`.)
 
     ```sh
@@ -64,7 +61,7 @@ Usage
         )"
     ```
 
-    Option 2:   Start a session using SSH.
+    Option 2: Start a session using SSH.
     (Replace `/slc/dev/ec2-private-key-pem/slc-dev-ec2-key-pair`, `slc-dev-ssm-session-document`, and `/slc/dev/ec2-public-ip/slc-dev-ec2-instance`.)
 
     ```sh
@@ -86,8 +83,7 @@ Usage
         )"
     ```
 
-Cleanup
--------
+## Cleanup
 
 ```sh
 $ terragrunt run-all destroy --working-dir='envs/dev/' --non-interactive
