@@ -1,5 +1,6 @@
 # trivy:ignore:AVD-AWS-0178
 resource "aws_vpc" "main" {
+  # checkov:skip=CKV2_AWS_12:Default security group hardening is managed outside this module.
   cidr_block                       = var.vpc_cidr_block
   enable_dns_support               = true
   enable_dns_hostnames             = true

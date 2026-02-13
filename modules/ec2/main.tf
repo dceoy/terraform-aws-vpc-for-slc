@@ -1,6 +1,7 @@
 resource "aws_instance" "server" {
   # checkov:skip=CKV_AWS_126:Detailed monitoring is intentionally disabled for the optional admin instance.
   # checkov:skip=CKV_AWS_135:EBS optimization is not required for the optional admin instance.
+  # checkov:skip=CKV2_AWS_41:IAM role is attached through the launch template instance profile.
   count = var.create_ec2_instance ? 1 : 0
   launch_template {
     id      = aws_launch_template.server.id
@@ -113,6 +114,7 @@ resource "aws_iam_role" "server" {
 }
 
 resource "aws_ssm_parameter" "server" {
+  # checkov:skip=CKV2_AWS_34:This parameter stores a non-sensitive instance ID as String.
   count = length(aws_instance.server) > 0 ? 1 : 0
   name  = "/${var.system_name}/${var.env_type}/ec2-instance-id/${aws_instance.server[0].tags.Name}"
   type  = "String"
