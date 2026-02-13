@@ -1,20 +1,10 @@
 resource "aws_nat_gateway" "nat" {
-  count             = length(aws_eip.nat)
-  allocation_id     = aws_eip.nat[count.index].id
-  subnet_id         = var.public_subnet_ids[count.index]
+  count             = var.create_nat_gateway ? 1 : 0
   connectivity_type = "public"
+  availability_mode = "regional"
+  vpc_id            = var.vpc_id
   tags = {
-    Name       = "${var.system_name}-${var.env_type}-nat-public${count.index}"
-    SystemName = var.system_name
-    EnvType    = var.env_type
-  }
-}
-
-resource "aws_eip" "nat" {
-  count  = var.nat_gateway_count
-  domain = "vpc"
-  tags = {
-    Name       = "${var.system_name}-${var.env_type}-eip${count.index}"
+    Name       = "${var.system_name}-${var.env_type}-nat-regional"
     SystemName = var.system_name
     EnvType    = var.env_type
   }

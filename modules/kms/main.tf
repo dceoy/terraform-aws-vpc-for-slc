@@ -52,6 +52,23 @@ resource "aws_kms_key" "custom" {
             "aws:SourceAccount" = local.account_id
           }
         }
+      },
+      {
+        Sid    = "AllowCloudWatchLogsToUseKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${local.region}.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${local.region}:${local.account_id}:log-group:*"
+          }
+        }
       }
     ]
   })

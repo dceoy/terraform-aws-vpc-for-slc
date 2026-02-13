@@ -8,9 +8,9 @@ variable "env_type" {
   type        = string
 }
 
-variable "public_subnet_ids" {
-  description = "Public subnet IDs"
-  type        = list(string)
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
 }
 
 variable "private_route_table_ids" {
@@ -18,12 +18,8 @@ variable "private_route_table_ids" {
   type        = list(string)
 }
 
-variable "nat_gateway_count" {
-  description = "NAT gateway count"
-  type        = number
-  default     = null
-  validation {
-    condition     = var.nat_gateway_count == null || var.nat_gateway_count >= 0
-    error_message = "NAT gateway count must be greater than or equal to 0"
-  }
+variable "create_nat_gateway" {
+  description = "Whether to create a regional NAT gateway"
+  type        = bool
+  default     = false
 }
