@@ -2,7 +2,6 @@ resource "aws_nat_gateway" "nat" {
   count             = var.create_nat_gateway ? 1 : 0
   connectivity_type = "public"
   availability_mode = "regional"
-
   tags = {
     Name       = "${var.system_name}-${var.env_type}-nat-public-regional"
     SystemName = var.system_name
