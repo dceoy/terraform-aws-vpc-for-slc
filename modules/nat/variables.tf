@@ -18,12 +18,8 @@ variable "private_route_table_ids" {
   type        = list(string)
 }
 
-variable "nat_gateway_count" {
-  description = "NAT gateway count (regional mode: 0 to disable, 1 to enable)"
-  type        = number
-  default     = null
-  validation {
-    condition     = var.nat_gateway_count == null || contains([0, 1], var.nat_gateway_count)
-    error_message = "NAT gateway count must be 0 or 1 in regional mode"
-  }
+variable "create_nat_gateway" {
+  description = "Whether to create a regional NAT gateway"
+  type        = bool
+  default     = false
 }
