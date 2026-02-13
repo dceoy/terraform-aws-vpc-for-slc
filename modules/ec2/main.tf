@@ -1,4 +1,6 @@
 resource "aws_instance" "server" {
+  # checkov:skip=CKV_AWS_126:Detailed monitoring is intentionally disabled for the optional admin instance.
+  # checkov:skip=CKV_AWS_135:EBS optimization is not required for the optional admin instance.
   count = var.create_ec2_instance ? 1 : 0
   launch_template {
     id      = aws_launch_template.server.id
@@ -140,6 +142,7 @@ resource "aws_key_pair" "ssh" {
 }
 
 resource "aws_ssm_parameter" "ssh" {
+  # checkov:skip=CKV_AWS_337:Use the default AWS-managed key for this SecureString parameter.
   count = length(tls_private_key.ssh) > 0 ? 1 : 0
   name  = "/${var.system_name}/${var.env_type}/ec2-private-key-pem/${aws_key_pair.ssh[count.index].key_name}"
   type  = "SecureString"

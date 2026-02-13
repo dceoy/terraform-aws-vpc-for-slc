@@ -1,5 +1,6 @@
 # trivy:ignore:AVD-AWS-0104
 resource "aws_security_group" "vpce" {
+  # checkov:skip=CKV_AWS_382:Allow outbound traffic for VPC interface endpoints.
   count       = length(var.vpc_interface_endpoint_services) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-sg-vpce"
   description = "Security group for VPC interface endpoints"
