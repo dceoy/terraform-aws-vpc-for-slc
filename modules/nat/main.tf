@@ -3,7 +3,7 @@ resource "aws_nat_gateway" "nat" {
   connectivity_type = "public"
   availability_mode = "regional"
   tags = {
-    Name       = "${var.system_name}-${var.env_type}-nat-public-regional"
+    Name       = "${var.system_name}-${var.env_type}-nat-regional"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
