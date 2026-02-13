@@ -31,6 +31,8 @@ resource "aws_route_table_association" "private" {
 
 # trivy:ignore:AVD-AWS-0104
 resource "aws_security_group" "private" {
+  # checkov:skip=CKV_AWS_382:Allow outbound traffic for private subnets.
+  # checkov:skip=CKV2_AWS_5:This security group is attached by dependent modules.
   count       = length(aws_subnet.private) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-sg-private"
   description = "Security group for private subnets"
@@ -75,6 +77,7 @@ resource "aws_vpc_endpoint" "gateway" {
 
 # trivy:ignore:AVD-AWS-0164
 resource "aws_subnet" "public" {
+  # checkov:skip=CKV_AWS_130:Public subnets intentionally assign public IPs on launch.
   count                   = var.public_subnet_count
   cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + length(local.azs))
   availability_zone       = local.azs[count.index]

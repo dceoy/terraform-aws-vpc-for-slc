@@ -1,5 +1,7 @@
 # trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "storage" {
+  # checkov:skip=CKV2_AWS_62:S3 event notifications are not required for these buckets.
+  # checkov:skip=CKV_AWS_144:Cross-region replication is intentionally disabled.
   for_each      = local.s3_bucket_names
   bucket        = each.value
   force_destroy = var.s3_force_destroy
