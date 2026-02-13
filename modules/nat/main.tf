@@ -1,6 +1,5 @@
 resource "aws_nat_gateway" "nat" {
   count             = var.create_nat_gateway ? 1 : 0
-  subnet_id         = var.public_subnet_ids[0]
   connectivity_type = "public"
   availability_mode = "regional"
 
@@ -12,8 +11,8 @@ resource "aws_nat_gateway" "nat" {
 }
 
 resource "aws_route" "nat" {
-  count                  = var.create_nat_gateway ? length(var.private_route_table_ids) : 0
+  count                  = length(aws_nat_gateway.nat)
   route_table_id         = var.private_route_table_ids[count.index]
-  nat_gateway_id         = aws_nat_gateway.nat[0].id
+  nat_gateway_id         = aws_nat_gateway.nat[count.index].id
   destination_cidr_block = "0.0.0.0/0"
 }
