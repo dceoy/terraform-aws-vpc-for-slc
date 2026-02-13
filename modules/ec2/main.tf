@@ -103,14 +103,18 @@ resource "aws_iam_role" "server" {
       }
     ]
   })
-  managed_policy_arns = compact([
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-    var.ssm_session_server_iam_policy_arn
-  ])
   tags = {
     Name    = "${var.system_name}-${var.env_type}-ec2-instance-role"
     EnvType = var.env_type
   }
+}
+
+resource "aws_iam_role_policy_attachments_exclusive" "server" {
+  role_name = aws_iam_role.server.name
+  policy_arns = compact([
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    var.ssm_session_server_iam_policy_arn
+  ])
 }
 
 resource "aws_ssm_parameter" "server" {
@@ -173,12 +177,17 @@ resource "aws_iam_role" "session" {
       }
     ]
   })
-  managed_policy_arns = compact([var.ssm_session_client_iam_policy_arn])
   tags = {
     Name       = "${var.system_name}-${var.env_type}-ec2-ssm-session-role"
     SystemName = var.system_name
     EnvType    = var.env_type
   }
+}
+
+resource "aws_iam_role_policy_attachments_exclusive" "session" {
+  count       = var.ssm_session_client_iam_policy_arn != null ? 1 : 0
+  role_name   = aws_iam_role.session.name
+  policy_arns = [var.ssm_session_client_iam_policy_arn]
 }
 
 resource "aws_iam_role_policy" "session" {

@@ -32,7 +32,7 @@ Terraform modules of Amazon VPC for serverless computing
 6.  Creates or updates infrastructure.
 
     ```sh
-    $ terragrunt run --all --working-dir='envs/dev/' -- apply --non-interactive
+    $ terragrunt run --all --working-dir='envs/dev/' --non-interactive -- apply
     ```
 
 7.  Retrieve the session document name, the EC2 instance ID, and the private key PEM name.
@@ -86,5 +86,5 @@ Terraform modules of Amazon VPC for serverless computing
 ## Cleanup
 
 ```sh
-$ terragrunt run --all --working-dir='envs/dev/' -- destroy --non-interactive
+$ terragrunt run --all --working-dir='envs/dev/' --non-interactive -- destroy
 ```

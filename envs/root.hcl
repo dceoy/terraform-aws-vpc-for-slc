@@ -81,7 +81,7 @@ inputs = {
   private_subnet_count                      = 1
   public_subnet_count                       = 1
   subnet_newbits                            = 8
-  create_nat_gateway                        = false
+  create_nat_gateway                        = true
   vpc_interface_endpoint_services = [
     "ec2", "ec2messages", "ssm", "ssmmessages", "kms",
     # "logs", "secretsmanager", "ecr.dkr", "ecr.api", "ecs", "ecs-agent", "ecs-telemetry"
