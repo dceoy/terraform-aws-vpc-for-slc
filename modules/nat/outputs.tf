@@ -3,16 +3,34 @@ output "nat_gateway_ids" {
   value       = aws_nat_gateway.nat[*].id
 }
 
-output "nat_gateway_addresses" {
-  description = "NAT gateway addresses for regional NAT gateways"
-  value       = aws_nat_gateway.nat[*].nat_gateway_addresses
+output "auto_provision_zones" {
+  description = "Auto provision zones reported by regional NAT gateway addresses"
+  value = compact(flatten([
+    for nat in aws_nat_gateway.nat : [
+      for address in nat.nat_gateway_addresses : try(tomap(address)["auto_provision_zones"], null)
+    ]
+  ]))
 }
 
-output "nat_gateway_public_ips" {
-  description = "Public IPs from NAT gateway addresses"
+output "auto_scaling_ips" {
+  description = "Auto scaling IPs reported by regional NAT gateway addresses"
+  value = compact(flatten([
+    for nat in aws_nat_gateway.nat : [
+      for address in nat.nat_gateway_addresses : try(tomap(address)["auto_scaling_ips"], null)
+    ]
+  ]))
+}
+
+output "regional_nat_gateway_address" {
+  description = "Regional NAT gateway addresses"
   value = flatten([
     for nat in aws_nat_gateway.nat : [
-      for address in nat.nat_gateway_addresses : address.public_ip
+      for address in nat.nat_gateway_addresses : try(tomap(address)["regional_nat_gateway_address"], null)
     ]
   ])
+}
+
+output "route_table_id" {
+  description = "Route table IDs associated with NAT routes"
+  value       = aws_route.nat[*].route_table_id
 }
