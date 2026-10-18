@@ -1,4 +1,4 @@
-# trivy:ignore:AVD-AWS-0089
+# trivy:ignore:AWS-0089
 resource "aws_s3_bucket" "storage" {
   # checkov:skip=CKV2_AWS_62:S3 event notifications are not required for these buckets.
   # checkov:skip=CKV_AWS_144:Cross-region replication is intentionally disabled.
@@ -28,7 +28,7 @@ resource "aws_s3_bucket_public_access_block" "storage" {
   restrict_public_buckets = true
 }
 
-# trivy:ignore:AVD-AWS-0132
+# trivy:ignore:AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "storage" {
   for_each = aws_s3_bucket.storage
   bucket   = each.value.id
@@ -103,7 +103,7 @@ resource "aws_s3_bucket_policy" "s3logs" {
   })
 }
 
-# trivy:ignore:AVD-AWS-0057
+# trivy:ignore:AWS-0057
 resource "aws_iam_policy" "storage" {
   count       = length(aws_s3_bucket.storage) > 0 ? 1 : 0
   name        = "${var.system_name}-${var.env_type}-s3-iam-policy"
