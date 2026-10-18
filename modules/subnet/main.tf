@@ -75,7 +75,7 @@ resource "aws_vpc_endpoint" "gateway" {
   }
 }
 
-# trivy:ignore:AVD-AWS-0164
+# trivy:ignore:AWS-0164
 # Public subnets intentionally issue public IPs; see the existing Checkov and Trivy exceptions.
 # nosemgrep: terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
 resource "aws_subnet" "public" {
