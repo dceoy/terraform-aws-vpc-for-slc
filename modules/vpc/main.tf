@@ -1,4 +1,4 @@
-# trivy:ignore:AVD-AWS-0178
+# trivy:ignore:AWS-0178
 resource "aws_vpc" "main" {
   # checkov:skip=CKV2_AWS_12:Default security group hardening is managed outside this module.
   cidr_block                       = var.vpc_cidr_block
@@ -49,7 +49,7 @@ resource "aws_flow_log" "logs" {
   }
 }
 
-# trivy:ignore:avd-aws-0017
+# trivy:ignore:AWS-0017
 resource "aws_cloudwatch_log_group" "flowlog" {
   count             = var.create_vpc_flow_log_group ? 1 : 0
   name              = "/${var.system_name}/${var.env_type}/vpc/flow-log/${aws_vpc.main.tags.Name}"

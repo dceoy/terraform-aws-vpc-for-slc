@@ -1,4 +1,4 @@
-# trivy:ignore:AVD-AWS-0104
+# trivy:ignore:AWS-0104
 resource "aws_security_group" "vpce" {
   # checkov:skip=CKV_AWS_382:Allow outbound traffic for VPC interface endpoints.
   # checkov:skip=CKV2_AWS_5:This security group is attached by aws_vpc_endpoint.interface.

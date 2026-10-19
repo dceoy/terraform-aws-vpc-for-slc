@@ -29,7 +29,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 }
 
-# trivy:ignore:AVD-AWS-0104
+# trivy:ignore:AWS-0104
 resource "aws_security_group" "private" {
   # checkov:skip=CKV_AWS_382:Allow outbound traffic for private subnets.
   # checkov:skip=CKV2_AWS_5:This security group is attached by dependent modules.
@@ -75,8 +75,9 @@ resource "aws_vpc_endpoint" "gateway" {
   }
 }
 
-# trivy:ignore:AVD-AWS-0164
-resource "aws_subnet" "public" {
+# Public subnets intentionally issue public IPs.
+# trivy:ignore:AWS-0164
+resource "aws_subnet" "public" { # nosemgrep: terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
   # checkov:skip=CKV_AWS_130:Public subnets intentionally assign public IPs on launch.
   count                   = var.public_subnet_count
   cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_newbits, count.index + length(local.azs))
