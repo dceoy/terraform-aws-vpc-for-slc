@@ -15,7 +15,7 @@ resource "aws_instance" "server" {
   }
   user_data         = <<-EOT
                       #!/usr/bin/env bash
-                      sudo sh -c 'dnf -y --refresh upgrade && dnf clean all && rm -rf /var/cache/dnf'
+                      sudo sh -c 'dnf -yq --refresh upgrade && dnf -yq clean all && rm -rf /var/cache/dnf'
                       EOT
   source_dest_check = true
   tags = {
