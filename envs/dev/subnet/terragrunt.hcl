@@ -18,5 +18,6 @@ inputs = {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/subnet"
+  source                   = "${get_repo_root()}/modules/subnet"
+  copy_terraform_lock_file = false
 }

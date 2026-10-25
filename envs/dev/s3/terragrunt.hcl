@@ -17,5 +17,6 @@ inputs = {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/s3"
+  source                   = "${get_repo_root()}/modules/s3"
+  copy_terraform_lock_file = false
 }

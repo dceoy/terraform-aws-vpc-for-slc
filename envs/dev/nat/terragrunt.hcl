@@ -26,5 +26,6 @@ inputs = {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/nat"
+  source                   = "${get_repo_root()}/modules/nat"
+  copy_terraform_lock_file = false
 }
