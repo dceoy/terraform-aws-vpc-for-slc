@@ -38,5 +38,6 @@ inputs = {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/ec2"
+  source                   = "${get_repo_root()}/modules/ec2"
+  copy_terraform_lock_file = false
 }

@@ -31,5 +31,6 @@ inputs = {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/vpce"
+  source                   = "${get_repo_root()}/modules/vpce"
+  copy_terraform_lock_file = false
 }
